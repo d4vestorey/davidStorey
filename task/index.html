@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="libs/css/styles.css">
+    <title>HTML api task</title>
+</head>
+<body>
+    <header>
+
+    </header>
+    
+    <main>
+
+        <table>
+            <tr>
+                <th>API Name</th>
+                <th>API description</th>
+                <th>Submit</th>
+            </tr>
+            <tr>
+                <td><a href="https://www.geonames.org/export/web-services.html#astergdem" target="_blank">1. Astergdem</a></td>
+                <td>
+                    <p>Enter coordinates to reveal elevation (metres)</p>
+                    <label for="selectLat">Latitude</label>
+                    <input type="number" id="selectLat"></select>
+                    <label for="selectLon">Longitude</label>
+                    <input type="number" id="selectLon"></select>
+                </td>
+                <td>
+                    <button id="altitudeBtn">Fetch Elevation</button>
+                </td>
+            </tr>
+            <tr>
+                <td><a href="https://www.geonames.org/export/JSON-webservices.html#weatherJSON" target="_blank">2. Weather</a></td>
+                <td>
+                    <p>Weather Station with most recent weather observation - enter coordinates</p>
+                    <label for="weatherLat">Latitude</label>
+                    <input type="number" id="weatherLat"></select>
+                    <label for="weatherLon">Longitude</label>
+                    <input type="number" id="weatherLon"></select>
+                </td>    
+                <td>
+                    <button id="weatherBtn">Fetch Weather</button>
+                </td>
+            </tr>
+            <tr>
+                <td><a href="https://www.geonames.org/export/web-services.html#neighbourhood" target="_blank">3. Neighbourhood / reverse geocoding</a></td>
+                <td>
+                    <p>Neighbourhood locator by coordinates (US only)</p>
+                    <label for="lat">Latitude</label>
+                    <input type="number" id="lat"></select>
+                    <label for="lng">Longitude</label>
+                    <input type="number" id="lng"></select>
+                </td>
+                <td>
+                    <button id="hoodBtn">Fetch Neighbourhood</button>
+                </td>
+            </tr>
+            <tr>
+                <td id="sub" colspan="3">Results</td>
+            </tr>
+            <tr>
+                <td>
+                    Elevation in metres:
+                </td>
+                <td colspan="2" id="results">
+
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    Weather Station:
+                </td>
+                <td colspan="2" id="station">
+                    
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    Temperature:
+                </td>
+                <td colspan="2" id="temp">
+                    
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    Cloud coverage:
+                </td>
+                <td colspan="2" id="cloud">
+                    
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    Neighbourhood:
+                </td>
+                <td colspan="2" id="hood">
+                    
+                </td>
+            </tr>
+            
+        </table>
+
+    </main>
+    
+    <script type="application/javascript" src="libs/js/jquery-3.6.3.min.js"></script>
+    <script type="application/javascript" src="libs/js/script.js"></script>
+    <script type="application/javascript" src="libs/js/script2.js"></script>
+    <script type="application/javascript" src="libs/js/script3.js"></script>
+</body>
+</html>

@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <link href="libs/images/favicon.ico" rel="icon">
+  <link href="libs/vendors/bootstrap-5.0.2-dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="libs/vendors/Leaflet.markercluster-1.4.1/dist/MarkerCluster.css"/>
+  <link rel="stylesheet" href="libs/vendors/Leaflet.markercluster-1.4.1/dist/MarkerCluster.Default.css"/>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css" integrity="sha256-kLaT2GOSpHechhsozzB+flnD+zUyjE2LlfWPgU04xyI=" crossorigin="" />
+  <link rel="stylesheet" href="libs/css/mapStyles.css"/>
+  <script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js" integrity="sha256-WBkoXOwTeyKclOHuWtc+i2uENFpDZ9YPdf5Hf+D7ewM=" crossorigin=""></script>
+  <script src="libs/vendors/Leaflet.markercluster-1.4.1/dist/leaflet.markercluster-src.js"></script>
+  <script src="libs/vendors/Leaflet.markercluster-1.4.1/dist/leaflet.markercluster.js"></script>
+    <title>Gazetteer - A Geogaphical Directory</title>
+</head>
+<body>
+
+    <div id="preloader"></div>
+
+    <nav class="dropdown text-center">
+        <select id="countrySelect">
+            <option>Select a Country</option>
+        </select>
+        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#myModal">
+          Info
+      </button>
+    </nav>
+  
+    <div id="map" class="container-fluid"></div>
+  
+  <!-- The Modal -->
+  <div class="modal" id="myModal">
+      <div class="modal-dialog">
+        <div class="modal-content">
+    
+          <!-- Modal Header -->
+          <div class="modal-header">
+            <h1 class="modal-title" id="selCountry"></h1>
+            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+          </div>
+    
+          <!-- Modal body -->
+          <div class="modal-body">
+            <div id="genInfoModal">
+              <div id="overviewFlagWrap"></div>
+              <table id="generalInfo" class="table">
+                  <tr>
+                      <th colspan = '2'>
+                          <h2>Overview</h2>
+                      </th>
+                  </tr>
+                  <tr>
+                      <td>Country Code (ISOa2):</td>
+                      <td id="countryCode"></td>
+                  </tr>
+                  <tr>
+                      <td>Capital City:</td>
+                      <td id="capital"></td>
+                  </tr>
+                  <tr>
+                      <td>Population:</td>
+                      <td id="population"></td>
+                  </tr>
+                  <tr>
+                      <td>Continent:</td>
+                      <td id="continent"></td>
+                  </tr>
+                  <tr>
+                      <td>Size(km):</td>
+                      <td id="area"></td>
+                  </tr>
+              </table>
+              
+          </div>
+          <div id="currencyInfoModal">
+              <table id="currencyInfo" class="table">
+                  <tr>
+                      <th colspan="2">
+                          <h2>Currency</h2>
+                      </th>
+                  </tr>
+                  <tr>
+                      <td>Currency:</td>
+                      <td id="currencyName"></td>
+                  </tr>
+                  <tr>
+                      <td>Currency code:</td>
+                      <td id="currencyCode"></td>
+                  </tr>
+                  <tr>
+                      <td>Exchange Rate (&#163):</td>
+                      <td id="exchange"></td>
+                  </tr>
+                  <tr>
+                      <td>Symbol:</td>
+                      <td id="currencySymbol"></td>
+                  </tr>
+              </table>
+          </div>
+          <div id="weatherModal">
+              <table id="weatherInfo" class="table">
+                  <tr>
+                      <th colspan="2">
+                          <h2>Weather</h2>
+                      </th>
+                  </tr>
+                  <tr>
+                      <th colspan="2">Current</th>
+                  </tr>
+                  <tr>
+                      <td>Temperature</td>
+                      <td id="curTemp"></td>
+                  </tr>
+                  <tr>
+                      <td>Feels Like</td>
+                      <td id="curFeelsTemp"></td>
+                  </tr>
+                  <tr>
+                      <td>Condition</td>
+                      <td id="curCondition"></td>
+                  </tr>
+                  <tr>
+                      <td>Rain</td>
+                      <td id="curRain"></td>
+                  </tr>
+                  <tr>
+                      <td>Wind Speed</td>
+                      <td id="curWind"></td>
+                  </tr>
+                  <tr>
+                      <td>Wind Direction</td>
+                      <td id="curWindDir"></td>
+                  </tr>
+                  <tr>
+                      <th colspan="2">Tomorrow</th>
+                  </tr>
+                  <tr>
+                      <td>Sunrise</td>
+                      <td id="tomSunrise"></td>
+                  </tr>
+                  <tr>
+                      <td>Condition</td>
+                      <td id="tomGenCondition"></td>
+                  </tr>
+                  <tr>
+                      <td>Max temp</td>
+                      <td id="tomMaxTemp"></td>
+                  </tr>
+                  <tr>
+                      <td>Min temp</td>
+                      <td id="tomMinTemp"></td>
+                  </tr>
+                  <tr>
+                      <td>Chance of rain</td>
+                      <td id="tomRainChance"></td>
+                  </tr>
+                  <tr>
+                      <td>Max wind</td>
+                      <td id="tomMaxWind"></td>
+                  </tr>
+                  <tr>
+                      <td>Sunset</td>
+                      <td id="tomSunset"></td>
+                  </tr>
+                  <tr>
+                      <td class="credit">
+                          <p>Powered by <a href="https://www.weatherapi.com/" title="Free Weather API">WeatherAPI.com</a></p>
+                      </td>
+                  </tr>
+              </table>
+          </div>
+  
+          </div>
+    
+          <!-- Modal footer -->
+          <div class="modal-footer">
+            <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
+          </div>
+    
+        </div>
+      </div>
+    </div>
+
+  <script src="libs/vendors/jquery-3.6.3.min.js"></script>
+  <script src="libs/js/script.js"></script>
+
+  <script src="libs/vendors/bootstrap-5.0.2-dist/js/bootstrap.min.js"></script>
+  
+</body>
+</html>

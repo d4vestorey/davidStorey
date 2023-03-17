@@ -8,36 +8,37 @@
   <link href="libs/vendors/bootstrap-5.0.2-dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="libs/vendors/Leaflet.markercluster-1.4.1/dist/MarkerCluster.css"/>
   <link rel="stylesheet" href="libs/vendors/Leaflet.markercluster-1.4.1/dist/MarkerCluster.Default.css"/>
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css" integrity="sha256-kLaT2GOSpHechhsozzB+flnD+zUyjE2LlfWPgU04xyI=" crossorigin="" />
   <link rel="stylesheet" href="libs/css/mapStyles.css"/>
-  <script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js" integrity="sha256-WBkoXOwTeyKclOHuWtc+i2uENFpDZ9YPdf5Hf+D7ewM=" crossorigin=""></script>
+  <link rel="stylesheet" href="libs/vendors/leaflet/leaflet.css">
+  <link rel="stylesheet" href="libs/vendors/fontawesome/css/fontawesome.css">
+  <link rel="stylesheet" href="libs/vendors/fontawesome/css/all.min.css">
+  <script src="libs/vendors/leaflet/leaflet.js"></script>
   <script src="libs/vendors/Leaflet.markercluster-1.4.1/dist/leaflet.markercluster-src.js"></script>
   <script src="libs/vendors/Leaflet.markercluster-1.4.1/dist/leaflet.markercluster.js"></script>
-    <title>Gazetteer - A Geogaphical Directory</title>
+  <link rel="stylesheet" href="libs/vendors/leaftletEasyButton/src/easy-button.css">
+  <script src="libs/vendors/leaftletEasyButton/src/easy-button.js"></script>
+    <title>Gazetteer - A Geographical Directory</title>
 </head>
 <body>
 
     <div id="preloader"></div>
 
-    <nav class="dropdown text-center">
-        <select id="countrySelect">
-            <option>Select a Country</option>
+    <nav class="text-center">
+        <select id="countrySelect" class="dropdown text-center">
+            <option>Country Select</option>
         </select>
-        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#myModal">
-          Info
-      </button>
     </nav>
   
     <div id="map" class="container-fluid"></div>
   
-  <!-- The Modal -->
-  <div class="modal" id="myModal">
+  <!-- Info Modal -->
+  <div class="modal" id="infoModal">
       <div class="modal-dialog">
         <div class="modal-content">
     
           <!-- Modal Header -->
           <div class="modal-header">
-            <h1 class="modal-title" id="selCountry"></h1>
+            <h1 class="modal-title" id="infoCountry"></h1>
             <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
           </div>
     
@@ -52,7 +53,7 @@
                       </th>
                   </tr>
                   <tr>
-                      <td>Country Code (ISOa2):</td>
+                      <td>Country Code:</td>
                       <td id="countryCode"></td>
                   </tr>
                   <tr>
@@ -74,107 +75,10 @@
               </table>
               
           </div>
-          <div id="currencyInfoModal">
-              <table id="currencyInfo" class="table">
-                  <tr>
-                      <th colspan="2">
-                          <h2>Currency</h2>
-                      </th>
-                  </tr>
-                  <tr>
-                      <td>Currency:</td>
-                      <td id="currencyName"></td>
-                  </tr>
-                  <tr>
-                      <td>Currency code:</td>
-                      <td id="currencyCode"></td>
-                  </tr>
-                  <tr>
-                      <td>Exchange Rate (&#163):</td>
-                      <td id="exchange"></td>
-                  </tr>
-                  <tr>
-                      <td>Symbol:</td>
-                      <td id="currencySymbol"></td>
-                  </tr>
-              </table>
-          </div>
-          <div id="weatherModal">
-              <table id="weatherInfo" class="table">
-                  <tr>
-                      <th colspan="2">
-                          <h2>Weather</h2>
-                      </th>
-                  </tr>
-                  <tr>
-                      <th colspan="2">Current</th>
-                  </tr>
-                  <tr>
-                      <td>Temperature</td>
-                      <td id="curTemp"></td>
-                  </tr>
-                  <tr>
-                      <td>Feels Like</td>
-                      <td id="curFeelsTemp"></td>
-                  </tr>
-                  <tr>
-                      <td>Condition</td>
-                      <td id="curCondition"></td>
-                  </tr>
-                  <tr>
-                      <td>Rain</td>
-                      <td id="curRain"></td>
-                  </tr>
-                  <tr>
-                      <td>Wind Speed</td>
-                      <td id="curWind"></td>
-                  </tr>
-                  <tr>
-                      <td>Wind Direction</td>
-                      <td id="curWindDir"></td>
-                  </tr>
-                  <tr>
-                      <th colspan="2">Tomorrow</th>
-                  </tr>
-                  <tr>
-                      <td>Sunrise</td>
-                      <td id="tomSunrise"></td>
-                  </tr>
-                  <tr>
-                      <td>Condition</td>
-                      <td id="tomGenCondition"></td>
-                  </tr>
-                  <tr>
-                      <td>Max temp</td>
-                      <td id="tomMaxTemp"></td>
-                  </tr>
-                  <tr>
-                      <td>Min temp</td>
-                      <td id="tomMinTemp"></td>
-                  </tr>
-                  <tr>
-                      <td>Chance of rain</td>
-                      <td id="tomRainChance"></td>
-                  </tr>
-                  <tr>
-                      <td>Max wind</td>
-                      <td id="tomMaxWind"></td>
-                  </tr>
-                  <tr>
-                      <td>Sunset</td>
-                      <td id="tomSunset"></td>
-                  </tr>
-                  <tr>
-                      <td class="credit">
-                          <p>Powered by <a href="https://www.weatherapi.com/" title="Free Weather API">WeatherAPI.com</a></p>
-                      </td>
-                  </tr>
-              </table>
-          </div>
   
           </div>
     
-          <!-- Modal footer -->
+          <!-- Info Modal footer -->
           <div class="modal-footer">
             <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
           </div>
@@ -183,9 +87,261 @@
       </div>
     </div>
 
+
+
+    <!-- Money Modal -->
+  <div class="modal" id="moneyModal">
+    <div class="modal-dialog">
+      <div class="modal-content">
+  
+        <!-- Modal Header -->
+        <div class="modal-header">
+          <h1 class="modal-title" id="currencyCountry"></h1>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+  
+        <!-- Modal body -->
+        <div class="modal-body">
+          <div id="genInfoModal">
+            <div id="overviewFlagWrap"></div>
+        <div id="currencyInfoModal">
+            <table id="currencyInfo" class="table">
+                <tr>
+                    <th colspan="2">
+                        <h2>Currency</h2>
+                    </th>
+                </tr>
+                <tr>
+                    <td>Currency:</td>
+                    <td id="currencyName"></td>
+                </tr>
+                <tr>
+                    <td>Currency code:</td>
+                    <td id="currencyCode"></td>
+                </tr>
+                <tr>
+                    <td>Exchange Rate (&#163):</td>
+                    <td id="exchange"></td>
+                </tr>
+                <tr>
+                    <td>Symbol:</td>
+                    <td id="currencySymbol"></td>
+                </tr>
+            </table>
+        </div>
+        </div>
+  
+        <!-- Money Modal footer -->
+        <div class="modal-footer">
+          <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
+        </div>
+  
+      </div>
+    </div>
+  </div>
+</div>
+
+
+    <!-- Weather Modal -->
+    <div class="modal" id="weathModal">
+        <div class="modal-dialog">
+          <div class="modal-content">
+      
+            <!-- Modal Header -->
+            <div class="modal-header">
+              <h1 class="modal-title" id="weatherCountry"></h1>
+              <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+
+
+            <!-- Modal body -->
+            <div class="modal-body">
+            <div id="weatherModal">
+                
+                <div class="container">
+                    <div class="row">
+                        <div class="col-12">
+                            <h2>Weather</h2>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-12">
+                            <h3>Today</h3>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-3">
+                            <img id="curIcon"/>
+                        </div>
+                        <div class="col-2">
+                            <div class="row">
+                                <p id="maxTemp"></p>
+                            </div>
+                            <div class="row">
+                                <p id="minTemp"></p>
+                            </div>
+                        </div>
+                        <div class="col-7">
+                            <p id="curCondition"></p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="container">
+                    <div class="row">
+                        <div class="col-12 border-top">
+                            <h4>Forecast</h4>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="row"></div>
+                        <div class="col-4">
+                            <img id="tomIcon"/>
+                        </div>
+                        <div class="col-2">
+                            <div class="row">
+                                <p id="tomMaxTemp"></p>
+                            </div>
+                            <div class="row">
+                                <p id="tomMinTemp"></p>
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <img id="nextIcon"/>
+                        </div>
+                        <div class="col-2">
+                            <div class="row">
+                                <p id="nextMaxTemp"></p>
+                            </div>
+                            <div class="row">
+                                <p id="nextMinTemp"></p>
+                            </div>
+                        </div>
+                    </div>
+                </div> 
+                <p class="credit">Powered by <a href="https://www.weatherapi.com/" title="Free Weather API">WeatherAPI.com</a></p>
+            </div>
+            </div>
+      
+            <!--Weather Modal footer -->
+            <div class="modal-footer">
+              <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
+            </div>
+      
+          </div>
+        </div>
+      </div>
+
+
+
+    <!-- News Modal -->
+    <div class="modal" id="newsModal">
+        <div class="modal-dialog">
+          <div class="modal-content">
+      
+            <!-- Modal Header -->
+            <div class="modal-header">
+              <h1 class="modal-title" id="newsCountry"></h1>
+              <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+
+            <!-- Modal body -->
+            <div class="modal-body">
+            <div id="newsModal">
+                
+                <div class="container">
+                    <div class="row">
+                        <div class="col-12">
+                            <h2>News</h2>
+                        </div>
+                    </div>
+                    <div class="row border-bottom">
+                        <div class="col-4">
+                            <div class="row">
+                                <img id="newsImage1">        
+                            </div>
+                            <div class="row">
+                                <h3 class="newsTitleText" id="newsTitle1">News Title</h3>
+                            </div>
+                            <div class="row d-flex align-items-end urlContain">
+                                <p><a class="newsUrlStyle" id="newsUrl1"></a></p>
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div class="row">
+                                <img id="newsImage2"> 
+                            </div>
+                            <div class="row">
+                                <h3 class="newsTitleText" id="newsTitle2">News Title</h3>
+                            </div>
+                            <div class="row d-flex align-items-end urlContain">
+                                <p><a class="newsUrlStyle" id="newsUrl2"></a></p>
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div class="row">
+                                <img id="newsImage3"> 
+                            </div>
+                            <div class="row">
+                                <h3 class="newsTitleText" id="newsTitle3">News Title</h3>
+                            </div>
+                            <div class="row d-flex align-items-end urlContain">
+                                <p><a class="newsUrlStyle" id="newsUrl3"></a></p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-4">
+                            <div class="row">
+                                <img id="newsImage4">        
+                            </div>
+                            <div class="row">
+                                <h3 class="newsTitleText" id="newsTitle4">News Title</h3>
+                            </div>
+                            <div class="row d-flex align-items-end urlContain">
+                                <p><a class="newsUrlStyle" id="newsUrl4"></a></p>
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div class="row">
+                                <img id="newsImage5"> 
+                            </div>
+                            <div class="row">
+                                <h3 class="newsTitleText" id="newsTitle5">News Title</h3>
+                            </div>
+                            <div class="row d-flex align-items-end urlContain">
+                                <p><a class="newsUrlStyle" id="newsUrl5"></a></p>
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div class="row">
+                                <img id="newsImage6"> 
+                            </div>
+                            <div class="row">
+                                <h3 class="newsTitleText" id="newsTitle6">News Title</h3>
+                            </div>
+                            <div class="row d-flex align-items-end urlContain">
+                                <p><a class="newsUrlStyle" id="newsUrl6"></a></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            </div>
+      
+            <!-- News Modal footer -->
+            <div class="modal-footer">
+              <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
+            </div>
+      
+          </div>
+        </div>
+      </div>
+
+
+
   <script src="libs/vendors/jquery-3.6.3.min.js"></script>
   <script src="libs/js/script.js"></script>
-
   <script src="libs/vendors/bootstrap-5.0.2-dist/js/bootstrap.min.js"></script>
   
 </body>

@@ -21,7 +21,7 @@
 	$array = json_decode($result,true);
 
     foreach ($array['features'] as $feature) {
-        if($feature['properties']['iso_a3'] == $location){
+        if($feature['properties']['iso_a2'] == $location){
             if($feature['geometry']['type'] == 'MultiPolygon'){
                 $coords = $feature['geometry']['coordinates'];
             } elseif($feature['geometry']['type'] == 'Polygon'){

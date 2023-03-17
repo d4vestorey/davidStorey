@@ -5,16 +5,8 @@
 
 	$executionStartTime = microtime(true);
 
-	$url='http://davestorey.co.uk/protected/countryBorders.geo.json';
 
-	$ch = curl_init();
-	curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
-	curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-	curl_setopt($ch, CURLOPT_URL,$url);
-
-	$result=curl_exec($ch);
-
-	curl_close($ch);
+	$result = file_get_contents('../data/countryBorders.geo.json');
 
 	$decode = json_decode($result,true);
 
@@ -22,8 +14,10 @@
     $countryArr=[];
 
     //iterate over the object to abstract the name of the country and append to empty array
-    for($i = 0; $i < 175; $i++){
-        array_push($countryArr,($decode["features"][$i]["properties"]["name"]. ", ".$decode["features"][$i]["properties"]["iso_a3"]));
+    for($i = 0; $i < count($decode["features"]); $i++){
+		$name = $decode["features"][$i]["properties"]["name"];
+		$code = $decode["features"][$i]["properties"]["iso_a2"];
+        array_push($countryArr,(object)['name'=> $name, 'code'=> $code]);
     }
 
     //sort the array into alphabetical order

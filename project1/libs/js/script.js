@@ -60,6 +60,18 @@ $(window).on('load', function () {
 //load data from the geojson document to populate the drop down select and call the getUserLocation function
 
 let openDeferred = $.Deferred();
+let deferred = $.Deferred();
+let countryIso;
+let currencyCode;
+let countryCurrencyIso;
+let capitalCity;
+let latitude;
+let longitude;
+let north; 
+let east; 
+let south;
+let west;
+
 
 $(function() {
 
@@ -88,17 +100,6 @@ $(function() {
   });
 
 getUserLocation();
-
-let countryIso;
-let currencyCode;
-let countryCurrencyIso;
-let capitalCity;
-let latitude;
-let longitude;
-let north; 
-let east; 
-let south;
-let west;
 
 
 function getUserLocation(){
@@ -157,9 +158,42 @@ function locationEnabled(position){
     });
 };
 
-let deferred = $.Deferred();
-          
-            
+
+//handle location settings when disabled by client
+function locationDisabled(){
+    $.when(openDeferred).done(function(){
+    reset();
+    $('#countrySelect').val('US');
+    countryIso = $('#countrySelect').val();
+          console.log(countryIso);
+          getCountryInfo();
+          getWikipedia();
+          getCountryOutLine();
+          getWeather();
+          getCurrency();
+          getExchangeRate();
+          getNews();
+});
+};
+
+
+//On country change section
+$('#countrySelect').change(function() {
+    countryIso = $('#countrySelect').val();
+          console.log(countryIso);
+          reset();
+          getCountryInfo();
+          getWikipedia();
+          getCountryOutLine();
+          getWeather();
+          getCurrency();
+          getExchangeRate();
+          getNews();
+});
+
+
+
+                   
 function getCountryInfo(){
     $.ajax({
     url: "libs/php/getCountryInfoWithIso.php",
@@ -444,35 +478,4 @@ function getNews(){
         }
     });
 });
-};                           
-
-                                                                
-//handle location settings when disabled by client
-function locationDisabled(){
-    $.when(openDeferred).done(function(){
-    $('#countrySelect').val('US');
-    countryIso = $('#countrySelect').val();
-          console.log(countryIso);
-          getCountryInfo();
-          getWikipedia();
-          getCountryOutLine();
-          getWeather();
-          getCurrency();
-          getExchangeRate();
-          getNews();
-});
 };
-
-//On country change section
-$('#countrySelect').change(function() {
-    countryIso = $('#countrySelect').val();
-          console.log(countryIso);
-          reset();
-          getCountryInfo();
-          getWikipedia();
-          getCountryOutLine();
-          getWeather();
-          getCurrency();
-          getExchangeRate();
-          getNews();
-});

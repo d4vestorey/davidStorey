@@ -1,7 +1,7 @@
 <?php
 
 	// remove for production
-
+/*
 	ini_set('display_errors', 'On');
 	error_reporting(E_ALL);
 
@@ -32,8 +32,13 @@
     $north = ($output['data'][0]['north']); 
     $east = ($output['data'][0]['east']); 
     $west = ($output['data'][0]['west']); 
-
+*/
     //////// Second API call to wikipedia articles in bounding box
+
+	$north = $_REQUEST['north'];
+	$south = $_REQUEST['south'];
+	$east = $_REQUEST['east'];
+	$west = $_REQUEST['west'];
 
     $url = 'api.geonames.org/wikipediaBoundingBoxJSON?north='.$north.'&south='.$south.'&east='.$east.'&west='.$west.'&username=d4vestorey&maxRows=600';
 

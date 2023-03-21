@@ -95,6 +95,10 @@ let countryCurrencyIso;
 let capitalCity;
 let latitude;
 let longitude;
+let north; 
+let east; 
+let south;
+let west;
 
 
 function getUserLocation(){
@@ -187,10 +191,10 @@ function getCountryInfo(){
         $('#countryCode').html(second.data[0].countryCode);
         $('#overviewFlagWrap').append('<td><img id=overviewFlag src="https://img.geonames.org/flags/x/'+isoForFlag+'.gif"/></td>');
         
-        let north = second.data[0].north;
-        let east = second.data[0].east;
-        let south = second.data[0].south;
-        let west = second.data[0].west;
+        north = second.data[0].north;
+        east = second.data[0].east;
+        south = second.data[0].south;
+        west = second.data[0].west;
 
         let southWest = L.latLng(south, west);
         let northEast = L.latLng(north, east);
@@ -340,7 +344,10 @@ function getWikipedia(){
     type: 'POST',
     dataType: 'json',
     data: {
-        country: countryIso,
+        north: north,
+        south: south,
+        east: east,
+        west: west,
     },
         success: function(seven) {
 
@@ -468,4 +475,4 @@ $('#countrySelect').change(function() {
           getCurrency();
           getExchangeRate();
           getNews();
-});          
+});

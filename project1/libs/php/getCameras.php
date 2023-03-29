@@ -1,6 +1,6 @@
 <?php
 
-$countryCode = 'GB';//$_REQUEST['countryCode'];
+$countryCode = $_REQUEST['countryCode'];
 
 $api_key = 'mx8oNTOovHffAelcbQSwXBs98kwdbg3N';
 

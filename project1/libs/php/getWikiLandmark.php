@@ -41,9 +41,7 @@
 	$west = $_REQUEST['west'];
 	$countryCode = $_REQUEST['countryCode'];
 
-    $url = 'api.geonames.org/wikipediaBoundingBoxJSON?north='.$north.'&south='.$south.'&east='.$east.'&west='.$west.'&username=d4vestorey&maxRows=100';
-
-	//$url = 'http://api.geonames.org/wikipediaBoundingBoxJSON?formatted=true&north=44.1&south=-9.9&east=-22.4&west=55.2&username=d4vestorey&style=full';
+    $url = 'api.geonames.org/wikipediaBoundingBoxJSON?north='.$north.'&south='.$south.'&east='.$east.'&west='.$west.'&username=d4vestorey&maxRows=50';
 
 	$ch = curl_init();
 	curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
@@ -57,10 +55,10 @@
 	$array = json_decode($result,true);
 
 	
-$results = array();
+    $results = array();
 
 	foreach($array['geonames'] as $wiki){
-		if($wiki['countryCode'] == $countryCode && (($wiki['feature'] == 'landmark')||($wiki['feature'] == 'airport')||($wiki['feature'] == 'city'))){
+		if($wiki['countryCode'] == $countryCode AND $wiki['feature'] != 'country'){
 			$results[] = $wiki;
 		} 
 	}

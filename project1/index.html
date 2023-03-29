@@ -4,27 +4,28 @@
   <meta charset="UTF-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <link href="libs/images/favicon.ico" rel="icon">
-  <link href="libs/vendors/bootstrap-5.0.2-dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="apple-touch-icon" sizes="180x180" href="libs/images/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="libs/images/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="libs/images/favicon-16x16.png">
+  <link rel="manifest" href="libs/images/site.webmanifest">
+  <link rel="stylesheet" href="libs/vendors/bootstrap-5.0.2-dist/css/bootstrap.min.css" >
   <link rel="stylesheet" href="libs/vendors/Leaflet.markercluster-1.4.1/dist/MarkerCluster.css"/>
   <link rel="stylesheet" href="libs/vendors/Leaflet.markercluster-1.4.1/dist/MarkerCluster.Default.css"/>
-  <link rel="stylesheet" href="libs/css/mapStyles.css"/>
   <link rel="stylesheet" href="libs/vendors/leaflet/leaflet.css">
+  <link rel="stylesheet" href="libs/vendors/leaftletEasyButton/src/easy-button.css">
   <link rel="stylesheet" href="libs/vendors/fontawesome/css/fontawesome.css">
   <link rel="stylesheet" href="libs/vendors/fontawesome/css/all.min.css">
-  <script src="libs/vendors/leaflet/leaflet.js"></script>
-  <script src="libs/vendors/Leaflet.markercluster-1.4.1/dist/leaflet.markercluster-src.js"></script>
-  <script src="libs/vendors/Leaflet.markercluster-1.4.1/dist/leaflet.markercluster.js"></script>
-  <link rel="stylesheet" href="libs/vendors/leaftletEasyButton/src/easy-button.css">
-  <script src="libs/vendors/leaftletEasyButton/src/easy-button.js"></script>
+  <link rel="stylesheet" href="libs/vendors/leafletExtraMarkers/dist/css/leaflet.extra-markers.min.css">
+  <link rel="stylesheet" href="libs/css/mapStyles.css"/>
+  
     <title>Gazetteer - A Geographical Directory</title>
 </head>
 <body>
 
     <div id="preloader"></div>
 
-    <nav class="text-center">
-        <select id="countrySelect" class="dropdown text-center">
+    <nav class="mt-2">
+        <select id="countrySelect" class="form-select form-select-sm dropdown text-center">
             <option>Country Select</option>
         </select>
     </nav>
@@ -32,7 +33,7 @@
     <div id="map" class="container-fluid"></div>
   
   <!-- Info Modal -->
-  <div class="modal" id="infoModal">
+  <div class="modal" id="infoModal" data-backdrop="static" data-keyboard="false">
       <div class="modal-dialog">
         <div class="modal-content">
     
@@ -53,24 +54,24 @@
                       </th>
                   </tr>
                   <tr>
-                      <td>Country Code:</td>
-                      <td id="countryCode"></td>
+                      <td>Country Code</td>
+                      <td class="text-end" id="countryCode"></td>
                   </tr>
                   <tr>
-                      <td>Capital City:</td>
-                      <td id="capital"></td>
+                      <td>Capital City</td>
+                      <td class="text-end" id="capital"></td>
                   </tr>
                   <tr>
-                      <td>Population:</td>
-                      <td id="population"></td>
+                      <td>Population</td>
+                      <td class="text-end" id="population"></td>
                   </tr>
                   <tr>
-                      <td>Continent:</td>
-                      <td id="continent"></td>
+                      <td>Continent</td>
+                      <td class="text-end" id="continent"></td>
                   </tr>
                   <tr>
-                      <td>Size(km):</td>
-                      <td id="area"></td>
+                      <td>Size</td>
+                      <td class="text-end" id="area"></td>
                   </tr>
               </table>
               
@@ -90,7 +91,7 @@
 
 
     <!-- Money Modal -->
-  <div class="modal" id="moneyModal">
+  <div class="modal" id="moneyModal" data-backdrop="static" data-keyboard="false">
     <div class="modal-dialog">
       <div class="modal-content">
   
@@ -112,24 +113,39 @@
                     </th>
                 </tr>
                 <tr>
-                    <td>Currency:</td>
-                    <td id="currencyName"></td>
+                    <td>Local Currency</td>
+                    <td class='text-end' id="currencyName"></td>
                 </tr>
                 <tr>
-                    <td>Currency code:</td>
-                    <td id="currencyCode"></td>
-                </tr>
-                <tr>
-                    <td>Exchange Rate (&#163):</td>
-                    <td id="exchange"></td>
-                </tr>
-                <tr>
-                    <td>Symbol:</td>
-                    <td id="currencySymbol"></td>
+                    <td>Currency Code</td>
+                    <td class='text-end' id="currencyCode"></td>
                 </tr>
             </table>
         </div>
         </div>
+
+        <h3>Currency Calculator</h3>
+
+        <form id="converterForm">
+            <label for="convertInput" class="text-left">Amount to convert</label>
+            
+            <div class="row">
+                <div class="col-4">
+                    <input id="convertInput" class="form-control fs-6 pt-2 pb-2" type="number" value="1">
+                </div>
+                <br>
+                <div class="col-8">
+                    <select id="currencySelect" class="form-select form-select-sm dropdown text-center fs-6 pt-2 pb-2">
+                        <option>Select Currency</option>
+                    </select>
+                </div>
+            </div>
+
+            <br>
+
+        </form>
+
+       <p class="text-center" id="convertedResult" value="Converted Currency"></p>
   
         <!-- Money Modal footer -->
         <div class="modal-footer">
@@ -143,7 +159,7 @@
 
 
     <!-- Weather Modal -->
-    <div class="modal" id="weathModal">
+    <div class="modal" id="weathModal" data-backdrop="static" data-keyboard="false">
         <div class="modal-dialog">
           <div class="modal-content">
       
@@ -160,71 +176,73 @@
                 
                 <div class="container">
                     <div class="row">
-                        <div class="col-12">
-                            <h2>Weather</h2>
+                        <div class="col">
+                            <h2 id="weatherLocation"></h2>
                         </div>
                     </div>
-                    <div class="row">
-                        <div class="col-12">
-                            <h3>Today</h3>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-3">
+                
+                    <div class="row border m-2 shadow-sm rounded">
+                        <h3>Today</h3>
+                        <div class="col">
                             <img id="curIcon"/>
                         </div>
-                        <div class="col-2">
+                        <div class="col">
                             <div class="row">
-                                <p id="maxTemp"></p>
+                                <p class="fw-bold fs-3" id="maxTemp"></p>
                             </div>
                             <div class="row">
-                                <p id="minTemp"></p>
+                                <p class="fs-4 text-secondary" id="minTemp"></p>
                             </div>
                         </div>
-                        <div class="col-7">
-                            <p id="curCondition"></p>
+                        <div class="col">
+                            <p class="fs-4 align-middle" id="curCondition"></p>
                         </div>
                     </div>
                 </div>
                 
                 <div class="container">
                     <div class="row">
-                        <div class="col-12 border-top">
-                            <h4>Forecast</h4>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="row"></div>
-                        <div class="col-4">
-                            <img id="tomIcon"/>
-                        </div>
-                        <div class="col-2">
+                        <div class="col border m-2 shadow-sm rounded">
                             <div class="row">
-                                <p id="tomMaxTemp"></p>
+                                <h4 class="text-center" id="tomorrowDate"></h4>
+                                <div class="col">
+                                    <img id="tomIcon"/>
+                                </div>
+                                <div class="col">
+                                    <div class="row">
+                                        <p class="fw-bold fs-4" id="tomMaxTemp"></p>
+                                    </div>
+                                    <div class="row">
+                                        <p class="fs-6 text-secondary" id="tomMinTemp"></p>
+                                    </div>
+                                </div>
                             </div>
-                            <div class="row">
-                                <p id="tomMinTemp"></p>
-                            </div>
                         </div>
-                        <div class="col-4">
-                            <img id="nextIcon"/>
-                        </div>
-                        <div class="col-2">
+                        <div class="col border m-2 shadow-sm rounded">
                             <div class="row">
-                                <p id="nextMaxTemp"></p>
-                            </div>
-                            <div class="row">
-                                <p id="nextMinTemp"></p>
+                                <h4 class="text-center" id="nextDayDate"></h4>
+                                <div class="col">
+                                    <img id="nextIcon"/>
+                                </div>
+                                <div class="col">
+                                    <div class="row">
+                                        <p class="fw-bold fs-4" id="nextMaxTemp"></p>
+                                    </div>
+                                    <div class="row">
+                                        <p class="fs-6 text-secondary" id="nextMinTemp"></p>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div> 
-                <p class="credit">Powered by <a href="https://www.weatherapi.com/" title="Free Weather API">WeatherAPI.com</a></p>
+                
             </div>
             </div>
       
             <!--Weather Modal footer -->
             <div class="modal-footer">
+            <p class="credit text-left">Powered by <a href="https://www.weatherapi.com/" title="Free Weather API">WeatherAPI.com</a></p>
               <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
             </div>
       
@@ -235,7 +253,7 @@
 
 
     <!-- News Modal -->
-    <div class="modal" id="newsModal">
+    <div class="modal" id="newsModal" data-backdrop="static" data-keyboard="false">
         <div class="modal-dialog">
           <div class="modal-content">
       
@@ -247,86 +265,22 @@
 
             <!-- Modal body -->
             <div class="modal-body">
-            <div id="newsModal">
+                <div id="newsModal">
+                <h2>News</h2>
+                <table id="newsTable" class="table table-sm">
+                    <thead>
+                        <tr>
+                            <th></th>
+                            <th></th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody class="table-striped">
+                    </tbody>    
+                </table>
                 
-                <div class="container">
-                    <div class="row">
-                        <div class="col-12">
-                            <h2>News</h2>
-                        </div>
-                    </div>
-                    <div class="row border-bottom">
-                        <div class="col-4">
-                            <div class="row">
-                                <img id="newsImage1">        
-                            </div>
-                            <div class="row">
-                                <h3 class="newsTitleText" id="newsTitle1">News Title</h3>
-                            </div>
-                            <div class="row d-flex align-items-end urlContain">
-                                <p><a class="newsUrlStyle" id="newsUrl1"></a></p>
-                            </div>
-                        </div>
-                        <div class="col-4">
-                            <div class="row">
-                                <img id="newsImage2"> 
-                            </div>
-                            <div class="row">
-                                <h3 class="newsTitleText" id="newsTitle2">News Title</h3>
-                            </div>
-                            <div class="row d-flex align-items-end urlContain">
-                                <p><a class="newsUrlStyle" id="newsUrl2"></a></p>
-                            </div>
-                        </div>
-                        <div class="col-4">
-                            <div class="row">
-                                <img id="newsImage3"> 
-                            </div>
-                            <div class="row">
-                                <h3 class="newsTitleText" id="newsTitle3">News Title</h3>
-                            </div>
-                            <div class="row d-flex align-items-end urlContain">
-                                <p><a class="newsUrlStyle" id="newsUrl3"></a></p>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-4">
-                            <div class="row">
-                                <img id="newsImage4">        
-                            </div>
-                            <div class="row">
-                                <h3 class="newsTitleText" id="newsTitle4">News Title</h3>
-                            </div>
-                            <div class="row d-flex align-items-end urlContain">
-                                <p><a class="newsUrlStyle" id="newsUrl4"></a></p>
-                            </div>
-                        </div>
-                        <div class="col-4">
-                            <div class="row">
-                                <img id="newsImage5"> 
-                            </div>
-                            <div class="row">
-                                <h3 class="newsTitleText" id="newsTitle5">News Title</h3>
-                            </div>
-                            <div class="row d-flex align-items-end urlContain">
-                                <p><a class="newsUrlStyle" id="newsUrl5"></a></p>
-                            </div>
-                        </div>
-                        <div class="col-4">
-                            <div class="row">
-                                <img id="newsImage6"> 
-                            </div>
-                            <div class="row">
-                                <h3 class="newsTitleText" id="newsTitle6">News Title</h3>
-                            </div>
-                            <div class="row d-flex align-items-end urlContain">
-                                <p><a class="newsUrlStyle" id="newsUrl6"></a></p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
             </div>
+    
             </div>
       
             <!-- News Modal footer -->
@@ -340,9 +294,57 @@
 
 
 
+      <!-- Holidays Modal -->
+  <div class="modal" id="holidayModal" data-backdrop="static" data-keyboard="false">
+    <div class="modal-dialog">
+      <div class="modal-content">
+  
+        <!-- Modal Header -->
+        <div class="modal-header">
+          <h1 class="modal-title" id="holidayCountry"></h1>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+  
+        <!-- Modal body -->
+        <div class="modal-body">
+          <div id="holidayModal">
+            <h2 id="holidayYear" class="text-center">Observed Holidays</h2>
+            <table id="holidayInfo" class="table table-sm">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th class="text-end">Holiday</th>
+                    </tr>
+                </thead>
+                <tbody class="table-striped">
+                </tbody>    
+            </table>
+            
+        </div>
+
+        </div>
+  
+        <!-- Holidays Modal footer -->
+        <div class="modal-footer">
+          <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
+        </div>
+  
+      </div>
+    </div>
+  </div>
+
+
+
   <script src="libs/vendors/jquery-3.6.3.min.js"></script>
-  <script src="libs/js/script.js"></script>
+  <script src="libs/vendors/leaflet/leaflet.js"></script>
+  <script src="libs/vendors/Leaflet.markercluster-1.4.1/dist/leaflet.markercluster-src.js"></script>
+  <script src="libs/vendors/Leaflet.markercluster-1.4.1/dist/leaflet.markercluster.js"></script>
+  <script src="libs/vendors/leaftletEasyButton/src/easy-button.js"></script>
   <script src="libs/vendors/bootstrap-5.0.2-dist/js/bootstrap.min.js"></script>
+  <script src="libs/vendors/leafletExtraMarkers/dist/js/leaflet.extra-markers.min.js"></script>
+  <script type="text/javascript" src="libs/vendors/dateJs/date-en-GB.js"></script>
+  <script src="libs/vendors/numeralJs/numeral.min.js"></script>
+  <script src="libs/js/script.js"></script>
   
 </body>
 </html>

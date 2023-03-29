@@ -1,12 +1,34 @@
 /////// Leaflet initialisations
 
-const map = L.map('map');
+//// map layers
 
-const tile = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
-  maxZoom: 19,
-  zoomControl: false,
-  attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-  }).addTo(map);
+const topoMap = L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', {
+	maxZoom: 17,
+	attribution: 'Map data: &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, <a href="http://viewfinderpanoramas.org">SRTM</a> | Map style: &copy; <a href="https://opentopomap.org">OpenTopoMap</a> (<a href="https://creativecommons.org/licenses/by-sa/3.0/">CC-BY-SA</a>)'
+});
+
+const streetMap = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+	maxZoom: 19,
+	attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+});
+
+const sateliteMap = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+	attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
+});
+
+const basemaps = {
+    'Street' : streetMap,
+    'Topography': topoMap,
+    'Satelite': sateliteMap
+};
+
+
+///////////
+
+const map = L.map('map', {
+    layers: [streetMap]
+});
+
 
 let geojsonLayer = L.geoJSON().addTo(map);
 
@@ -30,6 +52,10 @@ L.easyButton('fa-newspaper', function(){
     $('#newsModal').modal('toggle');
 },'News').addTo(map);
 
+L.easyButton('fa-calendar-days', function(){
+    $('#holidayModal').modal('toggle');
+},'Holidays').addTo(map);
+
 
 L.easyButton('fa-location-crosshairs', function(){
     getUserLocation();
@@ -37,16 +63,93 @@ L.easyButton('fa-location-crosshairs', function(){
 
 
 //leaftlet marker cluster groups and custom marker icons for each group
-let landmarksGroup = L.markerClusterGroup();
-let landmarksIcon = L.icon({iconUrl: 'libs/images/pinMarker.png', iconSize: [30, 30]});
 
-let citiesGroup = L.markerClusterGroup();
-let citiesIcon = L.icon({iconUrl: 'libs/images/cityMarker.png', iconSize: [30, 30]});
+let citiesGroup = L.markerClusterGroup({
+    polygonOptions:{
+        fillColor: 'red',
+        color: '#fff',
+        dashArray: '5, 5',
+        weight: 2,
+        opacity: 0.7,
+        fillOpacity: 0.5
+    }
+});
 
-let airportsGroup = L.markerClusterGroup();
-let airportsIcon = L.icon({iconUrl: 'libs/images/airportMarker.png', iconSize: [30, 30]});
+var cityMarker = L.ExtraMarkers.icon({
+    icon: 'fa-city',
+    markerColor: 'blue',
+    shape: 'circle',
+    prefix: 'fa'
+  });
 
-///////////
+let airportsGroup = L.markerClusterGroup({
+    polygonOptions:{
+        fillColor: 'red',
+        color: '#fff',
+        dashArray: '5, 5',
+        weight: 2,
+        opacity: 0.7,
+        fillOpacity: 0.5
+    }
+});
+
+var airportMarker = L.ExtraMarkers.icon({
+    icon: 'fa-plane',
+    markerColor: 'yellow',
+    shape: 'penta',
+    prefix: 'fa'
+  });
+
+let wikiGroup = L.markerClusterGroup({
+    polygonOptions:{
+        fillColor: 'red',
+        color: '#fff',
+        dashArray: '5, 5',
+        weight: 2,
+        opacity: 0.7,
+        fillOpacity: 0.5
+    }
+});
+
+var wikiMarker = L.ExtraMarkers.icon({
+    icon: 'fa-brands fa-wikipedia-w',
+    markerColor: 'grey',
+    shape: 'square',
+    prefix: 'fa'
+  });
+
+
+  let cameraGroup = L.markerClusterGroup({
+    polygonOptions:{
+        fillColor: 'red',
+        color: '#fff',
+        dashArray: '5, 5',
+        weight: 2,
+        opacity: 0.7,
+        fillOpacity: 0.5
+    }
+});
+
+var cameraMarker = L.ExtraMarkers.icon({
+    icon: 'fa-video',
+    markerColor: 'green',
+    shape: 'square',
+    prefix: 'fa'
+  });
+
+//// leaflet layer groups and control
+
+let layerGroups = L.layerGroup([citiesGroup, airportsGroup, wikiGroup, cameraGroup]);
+
+let overlays = {
+    'Airports': airportsGroup,
+    'Cities': citiesGroup,
+    'Wikipedia': wikiGroup,
+    'Cameras': cameraGroup
+};
+
+let layerControl = L.control.layers(basemaps, overlays).addTo(map);
+
 
 //preloader
 $(window).on('load', function () {
@@ -63,6 +166,7 @@ let openDeferred = $.Deferred();
 let deferred = $.Deferred();
 let countryIso;
 let currencyCode;
+let currencyExchangeTo;
 let countryCurrencyIso;
 let capitalCity;
 let latitude;
@@ -71,6 +175,8 @@ let north;
 let east; 
 let south;
 let west;
+let currentYear = new Date().getFullYear();
+const table = document.getElementById('newsTable');
 
 
 $(function() {
@@ -108,10 +214,11 @@ function getUserLocation(){
 
 
 function reset(){
-    if(landmarksGroup || citiesGroup || airportsGroup){
-        landmarksGroup.clearLayers();
+    if(wikiGroup || citiesGroup || airportsGroup || cameraGroup){
+        wikiGroup.clearLayers();
         citiesGroup.clearLayers();
         airportsGroup.clearLayers();
+        cameraGroup.clearLayers();
     };
 
     map.removeLayer(geojsonLayer);
@@ -122,6 +229,14 @@ function reset(){
 
     deferred = $.Deferred();
     console.log('reset has run');
+
+    $('#convertedResult').empty();
+
+    $('#convertInput').val('1');
+
+    $('#currencySelect').val('Select Currency');
+
+    removeAllRows();
 };
 
 
@@ -145,12 +260,15 @@ function locationEnabled(position){
           countryIso = first.data.countryCode;
           console.log(countryIso);
           getCountryInfo();
-          getWikipedia();
+          getWikipediaLandmarks();
+          getCities();
+          getAirports();
           getCountryOutLine();
           getWeather();
           getCurrency();
-          getExchangeRate();
           getNews();
+          getHolidays();
+          getCameras();
         },
         error: function(jqXHR, textStatus, errorThrown) {
             // your error code
@@ -167,12 +285,15 @@ function locationDisabled(){
     countryIso = $('#countrySelect').val();
           console.log(countryIso);
           getCountryInfo();
-          getWikipedia();
+          getWikipediaLandmarks();
+          getCities();
+          getAirports();
           getCountryOutLine();
           getWeather();
           getCurrency();
-          getExchangeRate();
           getNews();
+          getHolidays();
+          getCameras();
 });
 };
 
@@ -183,12 +304,15 @@ $('#countrySelect').change(function() {
           console.log(countryIso);
           reset();
           getCountryInfo();
-          getWikipedia();
+          getWikipediaLandmarks();
+          getCities();
+          getAirports();
           getCountryOutLine();
           getWeather();
           getCurrency();
-          getExchangeRate();
           getNews();
+          getHolidays();
+          getCameras();
 });
 
 
@@ -212,16 +336,21 @@ function getCountryInfo(){
         capitalCity = second.data[0].capital;
         
         let isoForFlag = countryIso.toLowerCase();
-  
+        
+        let population = numeral(second.data[0].population).format('O.Oa');
+        let area = numeral(second.data[0].areaInSqKm).format('O,O');
+
         $('#capital').html(second.data[0].capital);
-        $('#population').html(second.data[0].population);
+        $('#population').html(population);
         $('#continent').html(second.data[0].continentName);
         $('#currencyCode').html(second.data[0].currencyCode);
-        $('#area').html(second.data[0].areaInSqKm);
+        $('#area').html(area + ' km\u00B2');
         $('#infoCountry').html(second.data[0].countryName);
         $('#currencyCountry').html(second.data[0].countryName);
         $('#weatherCountry').html(second.data[0].countryName);
         $('#newsCountry').html(second.data[0].countryName);
+        $('#holidayCountry').html(second.data[0].countryName);
+        $('#holidayYear').html('Observed Holidays ' + currentYear);
         $('#countryCode').html(second.data[0].countryCode);
         $('#overviewFlagWrap').append('<td><img id=overviewFlag src="https://img.geonames.org/flags/x/'+isoForFlag+'.gif"/></td>');
         
@@ -234,8 +363,6 @@ function getCountryInfo(){
         let northEast = L.latLng(north, east);
         let bounds = L.latLngBounds(southWest, northEast);
 
-        //const latLng = L.latLng(latitude,longitude);
-        //console.log(latLng);
         map.fitBounds(bounds);
 
         console.log('second has run');
@@ -273,7 +400,15 @@ function getCountryOutLine(){
             }
           };
 
-          geojsonLayer = L.geoJSON(geojsonFeature).addTo(map);
+          geojsonLayer = L.geoJSON(geojsonFeature, {
+            style: function(feature){
+                return{
+                    color: 'red',
+                    opacity: 0.5,
+                    fillOpacity: 0.1
+                }
+            }
+          }).addTo(map);
 
           console.log('third has run');
 
@@ -298,20 +433,33 @@ function getWeather(){
     
 success: function(fourth) {
 
+    console.log(capitalCity);
+
+    //location
+    $('#weatherLocation').text(capitalCity + ' weather');
+
     //current weather
-    $('#maxTemp').html(fourth.data.forecast.forecastday[0].day.maxtemp_c);
-    $('#minTemp').html(fourth.data.forecast.forecastday[0].day.mintemp_c);
+    let currentMaxTemp = Math.round(fourth.data.forecast.forecastday[0].day.maxtemp_c);
+    $('#maxTemp').html(currentMaxTemp + '\u00B0C');
+    let currentMinTemp = Math.round(fourth.data.forecast.forecastday[0].day.mintemp_c);
+    $('#minTemp').html(currentMinTemp + '\u00B0C');
     $('#curCondition').html(fourth.data.forecast.forecastday[0].day.condition.text);
     $('#curIcon').attr("src", fourth.data.forecast.forecastday[0].day.condition.icon);
 
     //tomorrow
-    $('#tomMaxTemp').html(fourth.data.forecast.forecastday[1].day.maxtemp_c);
-    $('#tomMinTemp').html(fourth.data.forecast.forecastday[1].day.mintemp_c);
+    $('#tomorrowDate').html(Date.parse(fourth.data.forecast.forecastday[1].date).toString("ddd dS"));
+    let tomMaxTemp = Math.round(fourth.data.forecast.forecastday[1].day.maxtemp_c);
+    $('#tomMaxTemp').html(tomMaxTemp + '\u00B0C');
+    let tomMinTemp = Math.round(fourth.data.forecast.forecastday[1].day.mintemp_c)
+    $('#tomMinTemp').html(tomMinTemp + '\u00B0C');
     $('#tomIcon').attr("src",fourth.data.forecast.forecastday[1].day.condition.icon);
 
     //next day
-    $('#nextMaxTemp').html(fourth.data.forecast.forecastday[2].day.maxtemp_c);
-    $('#nextMinTemp').html(fourth.data.forecast.forecastday[2].day.mintemp_c);
+    $('#nextDayDate').html(Date.parse(fourth.data.forecast.forecastday[2].date).toString("ddd dS"));
+    let nextDayMaxTemp = Math.round(fourth.data.forecast.forecastday[2].day.maxtemp_c);
+    $('#nextMaxTemp').html(nextDayMaxTemp + '\u00B0C');
+    let nextDayMinTemp = Math.round(fourth.data.forecast.forecastday[2].day.mintemp_c);
+    $('#nextMinTemp').html(nextDayMinTemp + '\u00B0C');
     $('#nextIcon').attr("src",fourth.data.forecast.forecastday[2].day.condition.icon);
 
     console.log('fourth has run');
@@ -327,19 +475,24 @@ error: function(jqXHR, textStatus, errorThrown) {
 function getCurrency(){
     $.when(deferred).done(function(data2){
     $.ajax({
-    url: "libs/php/getCurrencySymbol.php",
+    url: "libs/php/getCurrencySymbolNew.php",
     type: 'POST',
     dataType: 'json',
 
     success: function(fifth) {
                     
-        for(let i = 0; i < fifth.data.length; i++){
-            if(fifth.data[i].abbreviation == countryCurrencyIso){
-                $('#currencySymbol').html(fifth.data[i].symbol);
-                $('#currencyName').html(fifth.data[i].currency);
-            }
-        }
+        console.log(fifth);
 
+        $('#currencyName').html(fifth[currencyCode].description)
+
+        //loop through the object to extract the country names and append to select options
+        $.each(fifth, function(code, info) {
+            const option = $("<option/>");
+            option.text(`${code} - ${info.description}`); // format the option text
+            option.val(code);
+            $('#currencySelect').append(option);
+          });
+        
         console.log('fifth has run');
 
     },
@@ -350,31 +503,34 @@ function getCurrency(){
 });
 };
 
-
 function getExchangeRate(){
-    $.when(deferred).done(function(data2){
     $.ajax({
-    url: "libs/php/getExchangeRates.php",
+    url: "libs/php/getExchangeRateNew.php",
     type: 'POST',
     dataType: 'json',
+    data: {
+        from: currencyCode, 
+        to: $('#currencySelect').val(),
+        amount: $('#convertInput').val(),
+    },
 
     success: function(sixth) {
-                                    
-        $('#exchange').html(sixth.data.conversion_rates[currencyCode]);
+    
+        let converted = numeral(sixth).format('O.OO');
+
+        $('#convertedResult').html($('#convertInput').val() + " " + currencyCode + " equals " + converted + " " + $('#currencySelect').val() );
         console.log('sixth has run');
     },
     error: function(jqXHR, textStatus, errorThrown) {
         // your error code
     }
     });
-});
 };
 
-
-function getWikipedia(){
+function getWikipediaLandmarks(){
     $.when(deferred).done(function(){
     $.ajax({
-    url: "libs/php/getWiki.php",
+    url: "libs/php/getWikiLandmark.php",
     type: 'POST',
     dataType: 'json',
     data: {
@@ -382,32 +538,77 @@ function getWikipedia(){
         south: south,
         east: east,
         west: west,
+        countryCode: countryIso,
     },
         success: function(seven) {
 
             console.log(countryIso);
-            seven.data.forEach(function(landmark){
-                if(landmark.feature == 'landmark'){
-                    let popUpContent = "<h4>" + landmark.title + "</h4><br>"+ landmark.summary + "<br> <a href=" + landmark.wikipediaURL + " target =_blank>More<a/>";
-                    landmarksGroup.addLayer(L.marker([landmark.lat,landmark.lng], {icon: landmarksIcon}).bindPopup(popUpContent));
-                    
-                }
-                if(landmark.feature == 'city'){
-                    let popUpContent = "<h4>" + landmark.title + "</h4><br>"+ landmark.summary + "<br> <a href=" + landmark.wikipediaURL + " target =_blank>More<a/>";
-                    citiesGroup.addLayer(L.marker([landmark.lat,landmark.lng], {icon: citiesIcon}).bindPopup(popUpContent));
-                    
-                }
-                if(landmark.feature == 'airport'){
-                    let popUpContent = "<h4>" + landmark.title + "</h4><br>"+ landmark.summary + "<br> <a href=" + landmark.wikipediaURL + " target =_blank>More<a/>";
-                    airportsGroup.addLayer(L.marker([landmark.lat,landmark.lng], {icon: airportsIcon}).bindPopup(popUpContent));
+            seven.forEach(function(landmark){
                 
-                }
+                let popUpContent = "<h4>" + landmark.title + "</h4><br>"+ landmark.summary ;
+                wikiGroup.addLayer(L.marker([landmark.lat,landmark.lng], {icon: wikiMarker}).bindPopup(popUpContent));
             })
-            map.addLayer(landmarksGroup);
-            map.addLayer(citiesGroup);
-            map.addLayer(airportsGroup);
+            map.addLayer(wikiGroup);
 
             console.log('seven has run');
+
+        },
+        error: function(jqXHR, textStatus, errorThrown) {
+            // your error code
+        }
+    });
+});
+};
+
+function getCities(){
+    $.when(deferred).done(function(){
+    $.ajax({
+    url: "libs/php/getWikiCity.php",
+    type: 'POST',
+    dataType: 'json',
+    data: {
+        countryCode: countryIso,
+    },
+        success: function(eight) {
+
+            console.log(countryIso);
+            eight.forEach(function(landmark){
+                let popUpContent = "<p>" + landmark.name + "</p>";
+                citiesGroup.addLayer(L.marker([landmark.lat,landmark.lng], {icon: cityMarker}).bindPopup(popUpContent));
+                
+            })
+            
+            map.addLayer(citiesGroup);
+            console.log('eight has run');
+
+        },
+        error: function(jqXHR, textStatus, errorThrown) {
+            // your error code
+        }
+    });
+});
+};
+
+function getAirports(){
+    $.when(deferred).done(function(){
+    $.ajax({
+    url: "libs/php/getWikiAirport.php",
+    type: 'POST',
+    dataType: 'json',
+    data: {
+        countryCode: countryIso,
+    },
+        success: function(nine) {
+
+            console.log(countryIso);
+            nine.forEach(function(landmark){
+                let popUpContent = "<p>" + landmark.name + "</p>";
+                airportsGroup.addLayer(L.marker([landmark.lat,landmark.lng], {icon: airportMarker}).bindPopup(popUpContent));
+                
+            })
+            
+            map.addLayer(airportsGroup);
+            console.log('nine has run');
 
         },
         error: function(jqXHR, textStatus, errorThrown) {
@@ -429,45 +630,33 @@ function getNews(){
         },
         
         success: function(eight) {
-
-            if(eight.data.length > 0){
-                $('#newsUrl1').attr("href", eight.data[0].url).html('Read more');
-                $('#newsTitle1').html(eight.data[0].title);
-                $('#newsImage1').attr("src", eight.data[0].image);
-                $('#newsUrl2').attr("href", eight.data[1].url).html('Read more');
-                $('#newsTitle2').html(eight.data[1].title);
-                $('#newsImage2').attr("src", eight.data[1].image);
-                $('#newsUrl3').attr("href", eight.data[2].url).html('Read more');
-                $('#newsTitle3').html(eight.data[2].title);
-                $('#newsImage3').attr("src", eight.data[2].image);
-                $('#newsUrl4').attr("href", eight.data[3].url).html('Read more');
-                $('#newsTitle4').html(eight.data[3].title);
-                $('#newsImage4').attr("src", eight.data[3].image);
-                $('#newsUrl5').attr("href", eight.data[4].url).html('Read more');
-                $('#newsTitle5').html(eight.data[4].title);
-                $('#newsImage5').attr("src", eight.data[4].image);
-                $('#newsUrl6').attr("href", eight.data[5].url).html('Read more');
-                $('#newsTitle6').html(eight.data[5].title);
-                $('#newsImage6').attr("src", eight.data[5].image);
-                } else {
-                    $('#newsUrl1').attr("href", '').html('');
-                    $('#newsTitle1').html("No local news stories available");
-                    $('#newsImage1').attr("src", '');
-                    $('#newsUrl2').attr("href", '').html('');
-                    $('#newsTitle2').html("No local news stories available");
-                    $('#newsImage2').attr("src", '');
-                    $('#newsUrl3').attr("href", '').html('');;
-                    $('#newsTitle3').html("No local news stories available");
-                    $('#newsImage3').attr("src", '');
-                    $('#newsUrl4').attr("href", '').html('');;
-                    $('#newsTitle4').html("No local news stories available");
-                    $('#newsImage4').attr("src", '');
-                    $('#newsUrl5').attr("href", '').html('');;
-                    $('#newsTitle5').html("No local news stories available");
-                    $('#newsImage5').attr("src", '');
-                    $('#newsUrl6').attr("href", '').html('');;
-                    $('#newsTitle6').html("No local news stories available");
-                    $('#newsImage6').attr("src", '');
+            
+                if(eight.length > 0){
+                eight.forEach(function(news){
+                    const newRow = table.insertRow();
+                    newRow.classList.add('align-middle');
+                    const cell1 = newRow.insertCell();
+                    const cell2 = newRow.insertCell();
+                    const img = document.createElement('img');
+                    img.onerror = function(){
+                        img.src = './libs/images/no-image-available-icon.png';
+                    };
+                    img.src = news.image;
+                    img.classList.add("img-fluid");
+                    img.classList.add("img-thumbnail");
+                    cell1.appendChild(img);
+                    const link = document.createElement('a');
+                    link.classList.add('text-body');
+                    link.textContent = news.title;
+                    link.setAttribute('target', '_blank');
+                    link.href = news.url;
+                    cell2.appendChild(link);
+                });
+                }else {
+                    const newRow = table.insertRow();
+                    const cell1 = newRow.insertCell();
+                    cell1.innerText = "No news articles available";
+                    cell1.classList.add('text-center');
                 }
 
                 console.log('eight has run');
@@ -479,3 +668,116 @@ function getNews(){
     });
 });
 };
+
+
+function getHolidays(){
+    $.when(deferred).done(function(data2){
+    $.ajax({
+    url: "libs/php/getHolidays.php",
+    type: 'GET',
+    dataType: 'json',
+    data: {
+        countryCode: countryIso,
+        year: currentYear,
+    },
+
+    success: function(ten) {
+                    
+        console.log(ten);
+
+        const table = document.getElementById('holidayInfo');
+
+        ten.forEach(function(holiday){
+            let date = new Date(holiday.date);
+            let formattedDate = date.toLocaleDateString('en-US', { day: 'numeric', month: 'short' });
+            const newRow = table.insertRow();
+            const cell1 = newRow.insertCell();
+            const cell2 = newRow.insertCell();
+            cell1.innerText = formattedDate;
+            cell2.innerText = holiday.name;
+            cell2.classList.add("text-end");
+        })
+        
+        console.log('ten has run');
+
+    },
+    error: function(jqXHR, textStatus, errorThrown) {
+        // your error code
+    } 
+    });
+});
+};
+
+
+function getCameras(){
+    $.when(deferred).done(function(data2){
+    $.ajax({
+    url: "libs/php/getCameras.php",
+    type: 'GET',
+    dataType: 'json',
+    data: {
+        countryCode: countryIso,
+    },
+
+    success: function(eleven) {
+                    
+        console.log(eleven);
+
+        eleven.forEach(function(camera){
+            
+            const div = document.createElement('div');
+            div.classList.add("text-center");
+            const h6 = document.createElement('h6');
+            const iframe = document.createElement('iframe');
+            const anchorTag = document.createElement('a');
+            
+            const textNode = document.createTextNode(camera.title);
+            h6.appendChild(textNode);
+            h6.classList.add('text-center');
+
+            div.appendChild(h6);
+
+            iframe.setAttribute('src', camera.player.day.embed);
+
+            div.appendChild(iframe);
+
+            if(camera.location.wikipedia){
+            anchorTag.setAttribute('href', camera.location.wikipedia);
+            anchorTag.setAttribute('target', '_blank');
+            anchorTag.textContent = 'More about this location';
+            div.appendChild(anchorTag);
+            };
+
+            let popUpContent = div;
+            
+            cameraGroup.addLayer(L.marker([camera.location.latitude,camera.location.longitude], {icon: cameraMarker}).bindPopup(popUpContent));
+        })
+
+        map.addLayer(cameraGroup);
+        
+        console.log('ten has run');
+
+    },
+    error: function(jqXHR, textStatus, errorThrown) {
+        // your error code
+    } 
+    });
+});
+};
+
+
+/// event handlers for change events in the currency modal
+$('#currencySelect').change(function(){
+    getExchangeRate();
+});
+
+$('#convertInput').on('input',function(){
+    getExchangeRate();
+});
+
+// Function to remove all rows from the news table
+function removeAllRows() {
+    while (table.rows.length > 0) {
+      table.deleteRow(0);
+    }
+  };

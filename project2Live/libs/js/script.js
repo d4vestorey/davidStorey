@@ -13,19 +13,23 @@ $(document).ready(function() {
     populateTable();
     getAllDepartments();
     getAllLocations();
+    populateDepartmentTable();
+    populateLocationTable();
 });
 
 
-selectedDeptValues = [];
-selectedLocationValues = [];
+let selectedDeptValues = [];
+let selectedLocationValues = [];
 
-
+//Populate the 3 tables with data
 function populateTable () {
     $.ajax({
-        type: "POST",
+        type: "GET",
         url: "libs/php/getAll.php",
         dataType: "json",
         success: function(data) {
+
+            console.log(data);
             $.each(data.data, function(key, value) {
                 $("#records").append("<tr data-row-id='" + value.id + "'class='employee'><td>" + value.firstName + "</td><td>" + value.lastName + "</td><td>" + value.jobTitle + "</td><td data-dept='" + value.deptID + "'>" + value.department + "</td><td>" + value.email + "</td><td>" + value.location + "</td><td><button data-row-id='" + value.id + "' data-bs-toggle='modal' data-bs-target='#editRecordModal' class='btn btn-primary editRecModalBtn'><i class='fa fa-user-pen fa-xs'></i></button></td><td> <button data-row-id='" + value.id + "' data-bs-toggle='modal' data-bs-target='#deleteRecordModal' class='btn btn-danger delRecModalBtn'><i class='fa fa-trash fa-xs'></i></button></td></tr>");
                 });
@@ -79,8 +83,108 @@ function populateTable () {
                 });
             }
         });
-}
+};
 
+function populateDepartmentTable () {
+    $.ajax({
+        type: "GET",
+        url: "libs/php/getLocationsAndDepartments.php",
+        dataType: "json",
+        success: function(data) {
+
+            console.log(data);
+            console.log($("#departmentRecords"));
+            
+            $.each(data, function(key, value) {
+                $("#departmentRecords").append("<tr data-row-id='" + value.deptID + "' class='department'><td>" + value.deptName + "</td><td data-locationId='" + value.locationID + "'>" + value.locationName + "</td><td><button data-row-id='" + value.deptID + "' data-bs-toggle='modal' data-bs-target='#editDepartmentModal' class='btn btn-primary editDeptRecModalBtn'><i class='fa fa-user-pen fa-xs'></i></button></td><td><button data-row-id='" + value.deptID + "' data-bs-toggle='modal' data-bs-target='#delDepartmentModal' class='btn btn-danger delDeptRecModalBtn'><i class='fa fa-trash fa-xs'></i></button></td></tr>");
+            });
+            
+                //functionality for department record deletion
+                const delButtons = document.querySelectorAll('.delDeptRecModalBtn');                    
+                delButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    const rowId = button.dataset.rowId;
+                    let delDeptName = document.querySelector(`#departmentRecords tr[data-row-id="${rowId}"] td:nth-child(1)`);
+                    let delDeptLocation = document.querySelector(`#departmentRecords tr[data-row-id="${rowId}"] td:nth-child(2)`);
+                    
+                    document.getElementById('deptIdDel').value = rowId;
+                    document.getElementById('deptNameDel').value = delDeptName.innerHTML;
+                    document.getElementById('deptLocationDel').value = delDeptLocation.innerHTML; 
+                });
+                });
+
+                //functionality for department record edit
+                const editButtons = document.querySelectorAll('.editDeptRecModalBtn');                    
+                editButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    const rowId = button.dataset.rowId;
+                    let editDeptName = document.querySelector(`#departmentRecords tr[data-row-id="${rowId}"] td:nth-child(1)`);
+                    let editDeptLocation = document.querySelector(`#departmentRecords tr[data-row-id="${rowId}"] td:nth-child(2)`);
+                    
+                    document.getElementById('deptIdEdit').value = rowId;
+                    document.getElementById('deptNameEdit').value = editDeptName.innerHTML;
+                    document.getElementById('deptLocationEdit').value = editDeptLocation.innerHTML;
+
+                    let locationCode = editDeptLocation.getAttribute("data-locationId");
+                    let locationSelect = document.getElementById('deptLocationEdit');
+                    for (let i = 0; i < locationSelect.options.length; i++) {
+                    if (locationSelect.options[i].value === locationCode) {
+                        locationSelect.options[i].selected = true;
+                        break;
+                    }
+                    }
+                });
+                });
+                
+            }
+        });
+};
+
+function populateLocationTable () {
+    $.ajax({
+        type: "GET",
+        url: "libs/php/getAllLocations.php",
+        dataType: "json",
+        success: function(data) {
+
+            console.log(data);
+            
+            $.each(data, function(key, value) {
+                $("#locationRecords").append("<tr data-row-id='" + value.id + "' class='location'><td>" + value.name + "</td><td><button data-row-id='" + value.id + "' data-bs-toggle='modal' data-bs-target='#editLocationModal' class='btn btn-primary editLocationRecModalBtn'><i class='fa fa-user-pen fa-xs'></i></button></td><td><button data-row-id='" + value.id + "' data-bs-toggle='modal' data-bs-target='#delLocationModal' class='btn btn-danger delLocationRecModalBtn'><i class='fa fa-trash fa-xs'></i></button></td></tr>");
+            });
+                
+                //functionality for location record deletion
+                const delButtons = document.querySelectorAll('.delLocationRecModalBtn');                    
+                delButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    const rowId = button.dataset.rowId;
+                    let delLocationName = document.querySelector(`#locationRecords tr[data-row-id="${rowId}"] td:nth-child(1)`);
+                    
+                    document.getElementById('locationIdDel').value = rowId;
+                    document.getElementById('locationNameDel').value = delLocationName.innerHTML;
+                });
+                });
+                
+                //functionality for location record edit
+                const editButtons = document.querySelectorAll('.editLocationRecModalBtn');                    
+                editButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    const rowId = button.dataset.rowId;
+                    let editLocationName = document.querySelector(`#locationRecords tr[data-row-id="${rowId}"] td:nth-child(1)`);
+                    
+                    document.getElementById('locationIdEdit').value = rowId;
+                    document.getElementById('locationNameEdit').value = editLocationName.innerHTML;
+                    
+                });
+                
+                });
+                
+            }
+        });
+};
+
+
+//free text search funtionality
 const employee = document.querySelectorAll('.employee');
 
 const employeeSearch = () =>{
@@ -96,8 +200,6 @@ const employeeSearch = () =>{
    let txtValue4;
    let txtValue5;
    let txtValue6;
-
-   //add in txtValues to for loop below::
 
    for (i = 0; i < tr.length; i++) {
     td1 = tr[i].getElementsByTagName("td")[0];
@@ -125,22 +227,17 @@ const employeeSearch = () =>{
 
 searchEmployee.addEventListener('input', (e) =>{
     employeeSearch(e.target.value.toUpperCase());
-})
+});
 
-
-
-function clearTableRows() {
-    $('#records tbody').empty();
-}
+//create, update and delete functions
 
 //create new personnel record
 const newPersonnelForm = document.getElementById('employeeRecordForm');
 const newPersonnelModal = new bootstrap.Modal(document.querySelector('#staticBackdrop'));
 
-
 function createNewPersonnelRecord(){
     $.ajax({
-        type: "POST",
+        type: "GET",
         url: "libs/php/insertPersonnel.php",
         dataType: "json",
         data:{
@@ -153,15 +250,7 @@ function createNewPersonnelRecord(){
         },
         success: function(data) {
 
-            console.log(data);
-            
-            alert(
-            `Record created with the following data:
-            First Name: ${data.data[0]}
-            Last Name: ${data.data[1]}
-            Job Title: ${data.data[2]}
-            email: ${data.data[3]}
-            Department: ${data.data[4]}`);
+            customPersonnelAlert(data.status.code, data.status.description);
 
             newPersonnelModal.hide();
             newPersonnelForm.reset();
@@ -171,16 +260,15 @@ function createNewPersonnelRecord(){
 };
 
 
-
 //delete personnel record
 const deletePersonnelRecordForm = document.getElementById('deletePersonnelRecordForm');
 const deletePersonnelRecordModal = new bootstrap.Modal(document.querySelector('#deleteRecordModal'));
 
-//new delete personnel which is called with confirm message
+//delete personnel 
 function deletePersonnelRecord() {
-    // code to delete record goes here
+    
     $.ajax({
-        type: "POST",
+        type: "GET",
         url: "libs/php/deletePersonnel.php",
         dataType: "json",
         data:{
@@ -192,18 +280,8 @@ function deletePersonnelRecord() {
             deptName: $("#deptDel").val(),
         },
         success: function(data) {
-
-            console.log(data);
             
-            alert(
-            `The following record was successfully deleted:
-            Personnel ID: ${data.data[0]}
-            First Name: ${data.data[1]}
-            Last Name: ${data.data[2]}
-            Job Title: ${data.data[3]}
-            Department: ${data.data[4]}
-            `
-            );
+            customPersonnelAlert(data.status.code, data.status.description);
             
             let rowToDelete = document.querySelector(`#records tr[data-row-id="${data.data[0]}"]`);
             rowToDelete.remove();
@@ -211,7 +289,6 @@ function deletePersonnelRecord() {
         }
     });
 }
-
 
 //edit personnel record
 const editPersonnelRecordForm = document.getElementById('editPersonnelRecordForm');
@@ -233,18 +310,9 @@ function editPersonnelRecord () {
         },
         success: function(data) {
 
-            console.log(data);
-            
-            alert(
-            `The following record was updated:
-            First Name: From: ${data.prevData.firstName} To: ${data.newData[0]}
-            Last Name: From: ${data.prevData.lastName} To: ${data.newData[1]}
-            Job Title: From: ${data.prevData.jobTitle} To: ${data.newData[2]}
-            email: From: ${data.prevData.email} To: ${data.newData[3]}
-            Department: From: ${data.prevData.department} To: ${data.newData[4]}
-            `
-            );
-            
+            console.log(data);            
+            customPersonnelAlert(data.status.code, data.status.description);
+
             clearTableRows();
             populateTable();
             editPersonnelRecordModal.hide();
@@ -267,14 +335,14 @@ function addNewLocation() {
         },
         success: function(data) {
 
-            console.log(data);
-            
-            alert(
-            data.status.description
-            );
-            
+            customLocationAlert(data.status.code, data.status.description);
             clearTableRows();
             populateTable();
+            clearLocationTableRows();
+            populateLocationTable();
+            clearLocationFilter();
+            selectedLocationValues = [];
+            getAllLocations();
             locationModal.hide();
             addNewLocationForm.reset();
         }
@@ -283,6 +351,7 @@ function addNewLocation() {
 
 //delete location
 const deleteLocationForm = document.getElementById('deleteLocationForm');
+const delLocationModal = new bootstrap.Modal(document.querySelector('#delLocationModal'));
 
 function deleteLocation(){
     $.ajax({
@@ -290,24 +359,55 @@ function deleteLocation(){
         url: "libs/php/deleteLocation.php",
         dataType: "json",
         data:{
-            locationID: $("#delLocationInput").val(),
-            name: $("#delLocationInput option:selected").text(),
+            locationID: $("#locationIdDel").val(),
+            name: $("#locationNameDel").val(),
         },
         success: function(data) {
 
             console.log(data);
             
-            alert(
-            data.status.description
-            );
-            
-            clearTableRows();
-            populateTable();
-            locationModal.hide();
+            customLocationAlert(data.status.code, data.status.description);
+            clearLocationTableRows();
+            populateLocationTable ();
+            clearLocationFilter();
+            selectedLocationValues = [];
+            getAllLocations();
+            delLocationModal.hide();
             deleteLocationForm.reset();
         }
     });
-}
+};
+
+
+//edit location
+const editLocationForm = document.getElementById('editLocationRecordForm');
+const editLocationModal = new bootstrap.Modal(document.querySelector('#editLocationModal'));
+
+function editLocation(){
+    $.ajax({
+        type: "POST",
+        url: "libs/php/editLocation.php",
+        dataType: "json",
+        data:{
+            locationID: $("#locationIdEdit").val(),
+            locationName: $("#locationNameEdit").val(),
+        },
+        success: function(data) {
+
+            console.log(data);
+            
+            customLocationAlert(data.status.code, data.status.description);
+            clearLocationTableRows();
+            clearTableRows();
+            populateTable();
+            populateLocationTable();
+            clearLocationFilter();
+            selectedLocationValues = [];
+            getAllLocations();
+            editLocationModal.hide();
+        }
+    });
+};
 
 //add new department
 const addNewDepartmentForm = document.getElementById('addNewDepartmentForm');
@@ -327,12 +427,12 @@ function addNewDepartment() {
 
             console.log(data);
             
-            alert(
-            data.status.description
-            );
-            
-            clearTableRows();
-            populateTable();
+            customDepartmentAlert(data.status.code, data.status.description);
+            clearDeptTableRows();
+            populateDepartmentTable();
+            clearDepartmentFilter();
+            selectedDeptValues = [];
+            getAllDepartments();
             departmentModal.hide();
             addNewDepartmentForm.reset();
         }
@@ -342,6 +442,7 @@ function addNewDepartment() {
 
 //delete department
 const deleteDepartmentForm = document.getElementById('deleteDepartmentForm');
+const delDepartmentModal = new bootstrap.Modal(document.querySelector('#delDepartmentModal'));
 
 function deleteDepartment(){
     $.ajax({
@@ -349,29 +450,84 @@ function deleteDepartment(){
         url: "libs/php/deleteDepartment.php",
         dataType: "json",
         data:{
-            deptName: $("#delDepartmentInput option:selected").text(),
-            deptID: $("#delDepartmentInput option:selected").val(),
+            //locationID: $("#delDepartmentInput option:selected").data('location'),
+            deptName: $("#deptNameDel").val(),
+            deptID: $("#deptIdDel").val(),
         },
         success: function(data) {
 
             console.log(data);
             
-            alert(
-            data.status.description
-            );
-            
+            customDepartmentAlert(data.status.code, data.status.description);
             clearTableRows();
             populateTable();
-            departmentModal.hide();
-            deleteDepartmentForm.reset();
+            clearDeptTableRows();
+            populateDepartmentTable();
+            clearDepartmentFilter();
+            selectedDeptValues = [];
+            getAllDepartments();
+            delDepartmentModal.hide();
         }
     });
 };
 
 
-function getAllDepartments () {
+//edit department
+const editDepartmentForm = document.getElementById('editDepartmentRecordForm');
+const editDepartmentModal = new bootstrap.Modal(document.querySelector('#editDepartmentModal'));
+
+function editDepartment(){
     $.ajax({
         type: "POST",
+        url: "libs/php/editDepartment.php",
+        dataType: "json",
+        data:{
+            locationID: $("#deptLocationEdit").val(),
+            deptName: $("#deptNameEdit").val(),
+            deptID: $("#deptIdEdit").val(),
+        },
+        success: function(data) {
+
+            console.log(data);
+            
+            customDepartmentAlert(data.status.code, data.status.description);
+            clearDeptTableRows();
+            clearTableRows();
+            populateTable();
+            populateDepartmentTable();
+            clearDepartmentFilter();
+            selectedDeptValues = [];
+            getAllDepartments();
+            editDepartmentModal.hide();
+        }
+    });
+};
+
+//helper functions
+function clearTableRows() {
+    $('#records tbody').empty();
+};
+
+function clearDeptTableRows() {
+    $('#departmentRecords tbody').empty();
+};
+
+function clearLocationTableRows() {
+    $('#locationRecords tbody').empty();
+};
+
+function clearLocationFilter() {
+    $('#locationFilter').empty();
+};
+
+function clearDepartmentFilter() {
+    $('#deptFilter').empty();
+};
+
+
+function getAllDepartments () {
+    $.ajax({
+        type: "GET",
         url: "libs/php/getAllDepartments.php",
         dataType: "json",
        
@@ -385,22 +541,22 @@ function getAllDepartments () {
                 $('<option>').text(option.name).val(option.id).appendTo(departments); //does this intefer with adding new record?
             });
 
-            //options for dept filter
-            $.each(data, function(index, option) {
-                var checkbox = $('<input type="checkbox" value="' + option.name + '" checked>');
-                checkbox.data('id', option.id);
-                var label = $('<label>').append(checkbox).append(option.name);
+              //options for dept filter
             
-                $('#deptFilter').append(label);
+            $.each(data, function(index, option) {
+                var checkbox = $('<label class="list-group-item"><input class="form-check-input me-1" type="checkbox" value="' + option.name + '" checked>'+ option.name +'</label>');
+                checkbox.data('id', option.id);
+                
+                $('#deptFilter').append(checkbox);
                 selectedDeptValues.push(option.id);
               });
         }
     });
-}
+};
 
 function getAllLocations () {
     $.ajax({
-        type: "POST",
+        type: "GET",
         url: "libs/php/getAllLocations.php",
         dataType: "json",
        
@@ -413,20 +569,19 @@ function getAllLocations () {
             data.forEach(function(option){
                 $('<option>').text(option.name).val(option.id).appendTo(locations);
             });
-
-            //options for location filter
-            $.each(data, function(index, option) {
-                var checkbox = $('<input type="checkbox" value="' + option.name + '" checked>');
-                checkbox.data('id', option.id);
-                var label = $('<label>').append(checkbox).append(option.name);
             
-                $('#locationFilter').append(label);
+            //options for dept filter
+                        
+            $.each(data, function(index, option) {
+                var checkbox = $('<label class="list-group-item"><input class="form-check-input me-1" type="checkbox" value="' + option.name + '" checked>'+ option.name +'</label>');
+                checkbox.data('id', option.id);
+                
+                $('#locationFilter').append(checkbox);
                 selectedLocationValues.push(option.id);
-              });
-
+            });
         }
     });
-}
+};
 
 //Reset modals when the 'close' button is clicked to return the forms to a blank state if opened again
 let closeButton = document.querySelectorAll('.closeModal');
@@ -440,23 +595,23 @@ closeButton.forEach(function(button) {
     });
   });
 
-
-//add selected checkboxes to an array to pass into ajax request
+//filtering
+//add selected department checkboxes to an array to pass into ajax request
 $(document).on('change', '#deptFilter input[type=checkbox]', function(){
     selectedDeptValues = [];
     $('#deptFilter input[type=checkbox]:checked').each(function() {
-        selectedDeptValues.push($(this).data('id'));
+        selectedDeptValues.push($(this).closest('label').data('id'));
     });
     console.log(selectedDeptValues);
     filterRecords();
 });
 
 
-//add selected checkboxes to an array to pass into ajax request
+//add selected location checkboxes to an array to pass into ajax request
 $(document).on('change', '#locationFilter input[type=checkbox]', function(){
     selectedLocationValues = [];
     $('#locationFilter input[type=checkbox]:checked').each(function() {
-        selectedLocationValues.push($(this).data('id'));
+        selectedLocationValues.push($(this).closest('label').data('id'));
     });
     console.log(selectedLocationValues);
     filterRecords();
@@ -471,7 +626,7 @@ function filterRecords(){
     };
     
     $.ajax({
-        type: "POST",
+        type: "GET",
         url: "libs/php/newFilter.php",
         dataType: "json",
         data: postData,
@@ -531,82 +686,375 @@ function filterRecords(){
                     });
         }
     });
+};
 
-}
 
-
+//event listeners for form submissions with custom confirm message
 deletePersonnelRecordForm.addEventListener('submit', function(event){
     event.preventDefault();
-
-    if (confirm("Are you sure you want to delete this record?")) {
-        // User clicked OK, perform deletion
-        deletePersonnelRecord();
-    } else {
-        // User clicked Cancel, do nothing
-    }
+    event.preventDefault();
+    const swalWithBootstrapButtons = Swal.mixin({
+        customClass: {
+          confirmButton: 'btn btn-success',
+          cancelButton: 'btn btn-danger'
+        },
+        buttonsStyling: false
+      })
+      
+      swalWithBootstrapButtons.fire({
+        title: 'Are you sure you want to delete this record?',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Yes, delete record!',
+        cancelButtonText: 'No, cancel!',
+        reverseButtons: true
+      }).then((result) => {
+        if (result.isConfirmed) {
+            deletePersonnelRecord();
+        } else if (
+          result.dismiss === Swal.DismissReason.cancel
+        ) {
+          swalWithBootstrapButtons.fire(
+            'Request cancelled',
+            'Record not deleted',
+            'info'
+          )
+        }
+      })
 });
 
 
 editPersonnelRecordForm.addEventListener('submit', function(event){
     event.preventDefault();
-    if (confirm("Are you sure you want to edit this record?")) {
-        // User clicked OK, perform deletion
-        editPersonnelRecord();
-    } else {
-        // User clicked Cancel, do nothing
-    }
+    const swalWithBootstrapButtons = Swal.mixin({
+        customClass: {
+          confirmButton: 'btn btn-success',
+          cancelButton: 'btn btn-danger'
+        },
+        buttonsStyling: false
+      })
+      
+      swalWithBootstrapButtons.fire({
+        title: 'Are you sure you want to edit this record?',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Yes, edit record!',
+        cancelButtonText: 'No, cancel!',
+        reverseButtons: true
+      }).then((result) => {
+        if (result.isConfirmed) {
+            editPersonnelRecord();
+        } else if (
+          result.dismiss === Swal.DismissReason.cancel
+        ) {
+          swalWithBootstrapButtons.fire(
+            'Request cancelled',
+            'Record not updated',
+            'info'
+          )
+        }
+      })
 });
 
 
 deleteLocationForm.addEventListener('submit', function(event){
     event.preventDefault();
-    if (confirm("Are you sure you want to delete this record?")) {
-        // User clicked OK, perform deletion
-        deleteLocation();
-    } else {
-        // User clicked Cancel, do nothing
-    }
+    const swalWithBootstrapButtons = Swal.mixin({
+        customClass: {
+          confirmButton: 'btn btn-success',
+          cancelButton: 'btn btn-danger'
+        },
+        buttonsStyling: false
+      })
+      
+      swalWithBootstrapButtons.fire({
+        title: 'Are you sure you want to delete this location?',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Yes, delete location!',
+        cancelButtonText: 'No, cancel!',
+        reverseButtons: true
+      }).then((result) => {
+        if (result.isConfirmed) {
+            deleteLocation();
+        } else if (
+          result.dismiss === Swal.DismissReason.cancel
+        ) {
+          swalWithBootstrapButtons.fire(
+            'Request cancelled',
+            'Location not deleted',
+            'info'
+          )
+        }
+      })
 });
 
 
 deleteDepartmentForm.addEventListener('submit', function(event){
     event.preventDefault();
-    if (confirm("Are you sure you want to delete this record?")) {
-        // User clicked OK, perform deletion
-        deleteDepartment();
-    } else {
-        // User clicked Cancel, do nothing
-    }
+    const swalWithBootstrapButtons = Swal.mixin({
+        customClass: {
+          confirmButton: 'btn btn-success',
+          cancelButton: 'btn btn-danger'
+        },
+        buttonsStyling: false
+      })
+      
+      swalWithBootstrapButtons.fire({
+        title: 'Are you sure you want to delete this record?',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Yes, delete department!',
+        cancelButtonText: 'No, cancel!',
+        reverseButtons: true
+      }).then((result) => {
+        if (result.isConfirmed) {
+            deleteDepartment();
+        } else if (
+          result.dismiss === Swal.DismissReason.cancel
+        ) {
+          swalWithBootstrapButtons.fire(
+            'Request cancelled',
+            'Department not deleted',
+            'info'
+          )
+        }
+      })
 });
 
 
 newPersonnelForm.addEventListener('submit', function(event) {
     event.preventDefault();
-    if (confirm("Are you sure you want to create this new record?")) {
-        // User clicked OK, perform deletion
-        createNewPersonnelRecord();
-    } else {
-        // User clicked Cancel, do nothing
-    }
+    const swalWithBootstrapButtons = Swal.mixin({
+        customClass: {
+          confirmButton: 'btn btn-success',
+          cancelButton: 'btn btn-danger'
+        },
+        buttonsStyling: false
+      })
+      
+      swalWithBootstrapButtons.fire({
+        title: 'Are you sure you want to create this new record?',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Yes, add person!',
+        cancelButtonText: 'No, cancel!',
+        reverseButtons: true
+      }).then((result) => {
+        if (result.isConfirmed) {
+            createNewPersonnelRecord();
+        } else if (
+          result.dismiss === Swal.DismissReason.cancel
+        ) {
+          swalWithBootstrapButtons.fire(
+            'Request cancelled',
+            'Personnel record not created',
+            'info'
+          )
+        }
+      })
 });
 
 
 addNewLocationForm.addEventListener('submit', function(event){
     event.preventDefault();
-    if (confirm("Are you sure you want to create this new location?")) {
-        // User clicked OK, perform deletion
-        addNewLocation();
-    } else {
-        // User clicked Cancel, do nothing
-    }
+    const swalWithBootstrapButtons = Swal.mixin({
+        customClass: {
+          confirmButton: 'btn btn-success',
+          cancelButton: 'btn btn-danger'
+        },
+        buttonsStyling: false
+      })
+      
+      swalWithBootstrapButtons.fire({
+        title: 'Are you sure you want to create this Location?',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Yes, add location!',
+        cancelButtonText: 'No, cancel!',
+        reverseButtons: true
+      }).then((result) => {
+        if (result.isConfirmed) {
+            addNewLocation();
+        } else if (
+          result.dismiss === Swal.DismissReason.cancel
+        ) {
+          swalWithBootstrapButtons.fire(
+            'Request cancelled',
+            'Location not created',
+            'info'
+          )
+        }
+      })
+
 });
+
 
 addNewDepartmentForm.addEventListener('submit', function(event){
     event.preventDefault();
-    if (confirm("Are you sure you want to create this new department?")) {
-        // User clicked OK, perform deletion
-        addNewDepartment();
-    } else {
-        // User clicked Cancel, do nothing
-    }
+    const swalWithBootstrapButtons = Swal.mixin({
+        customClass: {
+          confirmButton: 'btn btn-success',
+          cancelButton: 'btn btn-danger'
+        },
+        buttonsStyling: false
+      })
+      
+      swalWithBootstrapButtons.fire({
+        title: 'Are you sure you want to create this Department?',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Yes, add department!',
+        cancelButtonText: 'No, cancel!',
+        reverseButtons: true
+      }).then((result) => {
+        if (result.isConfirmed) {
+            addNewDepartment();
+        } else if (
+          result.dismiss === Swal.DismissReason.cancel
+        ) {
+          swalWithBootstrapButtons.fire(
+            'Add request cancelled',
+            'Department not created',
+            'info'
+          )
+        }
+      })
+
 });
+
+
+editDepartmentForm.addEventListener('submit', function(event){
+    event.preventDefault();
+    const swalWithBootstrapButtons = Swal.mixin({
+        customClass: {
+          confirmButton: 'btn btn-success',
+          cancelButton: 'btn btn-danger'
+        },
+        buttonsStyling: false
+      })
+      
+      swalWithBootstrapButtons.fire({
+        title: 'Are you sure you want to edit this Department?',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Yes, edit department!',
+        cancelButtonText: 'No, cancel!',
+        reverseButtons: true
+      }).then((result) => {
+        if (result.isConfirmed) {
+            editDepartment();
+        } else if (
+          result.dismiss === Swal.DismissReason.cancel
+        ) {
+          swalWithBootstrapButtons.fire(
+            'Edit request cancelled',
+            'Department not edited',
+            'info'
+          )
+        }
+      })
+});
+
+editLocationForm.addEventListener('submit', function(event){
+    event.preventDefault();
+    const swalWithBootstrapButtons = Swal.mixin({
+        customClass: {
+          confirmButton: 'btn btn-success',
+          cancelButton: 'btn btn-danger'
+        },
+        buttonsStyling: false
+      })
+      
+      swalWithBootstrapButtons.fire({
+        title: 'Are you sure you want to edit this Location?',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Yes, edit location!',
+        cancelButtonText: 'No, cancel!',
+        reverseButtons: true
+      }).then((result) => {
+        if (result.isConfirmed) {
+            editLocation();
+        } else if (
+          result.dismiss === Swal.DismissReason.cancel
+        ) {
+          swalWithBootstrapButtons.fire(
+            'Edit request cancelled',
+            'Location not edited',
+            'info'
+          )
+        }
+      })
+});
+
+
+//Custom alerts after form submission
+function customLocationAlert (code, description) {
+    
+    if(code == 200){
+        Swal.fire(
+            'Success',
+            description,
+            'success'
+          )
+    } else if (code == 400){
+        Swal.fire(
+            'Error!',
+            description,
+            'error'
+          )
+    } else if (code == 300){
+        Swal.fire(
+            'Error!',
+            description,
+            'error'
+          )
+    }
+};
+
+function customDepartmentAlert (code, description) {
+    
+    if(code == 200){
+        Swal.fire(
+            'Success',
+            description,
+            'success'
+          )
+    } else if (code == 400){
+        Swal.fire(
+            'Error!',
+            description,
+            'error'
+          )
+    } else if (code == 300){
+        Swal.fire(
+            'Error!',
+            description,
+            'error'
+          )
+    }
+};
+
+function customPersonnelAlert (code, description) {
+
+    if(code == 200){
+        Swal.fire(
+            'Success',
+            description,
+            'success'
+          )
+    } else if (code == 400){
+        Swal.fire(
+            'Error!',
+            description,
+            'error'
+          )
+    } else if (code == 300){
+        Swal.fire(
+            'Error!',
+            description,
+            'error'
+          )
+    }
+};

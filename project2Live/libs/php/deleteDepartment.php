@@ -1,5 +1,8 @@
 <?php
 
+    // example use from browser
+    // http://localhost/companydirectory/libs/php/deleteLocation.php?id=<id>
+
     $executionStartTime = microtime(true);
     
     // this includes the login details
@@ -26,12 +29,32 @@
 
     }
     $deptID = $_POST['deptID'];
-    $deptName = $_POST['deptAndLocationName'];
+    $deptName = $_POST['deptName'];
+
+    //validation
+    if (!isset($deptID) || empty($deptID)) {
+        $output['status']['code'] = "400";
+        $output['status']['name'] = "failure";
+        $output['status']['description'] = "Missing or empty location ID";
+        $output['status']['returnedIn'] = (microtime(true) - $executionStartTime) / 1000 . " ms";
+        $output['data'] = [];
+    
+        mysqli_close($conn);
+    
+        echo json_encode($output);
+    
+        exit;
+    }
 
     // check if department is being referenced in personnel table
-    $query = "SELECT COUNT(*) as total FROM personnel p LEFT JOIN department d ON (d.id = p.departmentID) LEFT JOIN location l ON (l.id = d.locationID) WHERE d.id = $deptID";
     
-    $result = $conn->query($query);
+    $query = $conn->prepare('SELECT COUNT(*) as total FROM personnel p LEFT JOIN department d ON (d.id = p.departmentID) LEFT JOIN location l ON (l.id = d.locationID) WHERE d.id = ?');
+
+    $query->bind_param("i", $deptID);
+
+    $query->execute();
+
+    $result = $query->get_result();
 
     if ($result->num_rows > 0) {
 
@@ -41,7 +64,7 @@
 
             $output['status']['code'] = "400";
             $output['status']['name'] = "failure";
-            $output['status']['description'] = "The department $deptName is being referenced in the personnel table. Unable to delete this department";
+            $output['status']['description'] = "The department $deptName is being referenced in the personnel table. Unable to delete this department at this location";
             $output['status']['returnedIn'] = (microtime(true) - $executionStartTime) / 1000 . " ms";
             $output['data'] = [];
 
@@ -56,17 +79,17 @@
     }
 
     // delete location
-	$query = $conn->prepare('DELETE FROM department WHERE id = ?');
+	$delQuery = $conn->prepare('DELETE FROM department WHERE id = ?');
 	
-	$query->bind_param("i", $deptID);
+	$delQuery->bind_param("i", $deptID);
 
-	$query->execute();
+	$delQuery->execute();
 
-    if (!$result) {
+    if ($delQuery->error) {
 
         $output['status']['code'] = "400";
         $output['status']['name'] = "failure";
-        $output['status']['description'] = "query failed";
+        $output['status']['description'] = $delQuery->error;
         $output['status']['returnedIn'] = (microtime(true) - $executionStartTime) / 1000 . " ms";
         $output['data'] = [];
 
@@ -78,10 +101,11 @@
 
     }
 
+
     $output['status']['code'] = "200";
     $output['status']['name'] = "ok";
     $output['status']['description'] = "The $deptName department has been deleted from the database";
-    $output['status']['returnedIn'] = (microtime(true) - $endLocatioxecutionStartTime) / 1000 . " ms";
+    $output['status']['returnedIn'] = (microtime(true) - $executionStartTime) / 1000 . " ms";
     $output['data'] = [];
 
     mysqli_close($conn);

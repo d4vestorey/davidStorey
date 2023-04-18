@@ -1,5 +1,8 @@
 <?php
 
+	// example use from browser
+	// http://localhost/companydirectory/libs/php/getAll.php
+
 	$executionStartTime = microtime(true);
 
 	include("config.php");

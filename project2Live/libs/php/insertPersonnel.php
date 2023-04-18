@@ -1,5 +1,8 @@
 <?php
 
+	// example use from browser
+	// http://localhost/companydirectory/libs/php/insertDepartment.php?name=New%20Department&locationID=<id>
+
 	$executionStartTime = microtime(true);
 	
 	// this includes the login details
@@ -14,7 +17,7 @@
 		
 		$output['status']['code'] = "300";
 		$output['status']['name'] = "failure";
-		$output['status']['description'] = "database unavailable";
+		$output['status']['description'] = "The database is unavailable";
 		$output['status']['returnedIn'] = (microtime(true) - $executionStartTime) / 1000 . " ms";
 		$output['data'] = [];
 
@@ -27,14 +30,30 @@
 	}	
 
 	// SQL statement accepts parameters and so is prepared to avoid SQL injection.
-	// $_REQUEST used for development / debugging. Remember to change to $_POST for production
 
-    $firstName = trim(ucfirst($_POST['firstName']));
-    $lastName = trim(ucfirst($_POST['lastName']));
-    $jobTitle = trim($_POST['jobTitle']);
+    $firstName = trim(ucwords($_POST['firstName']));
+    $lastName = trim(ucwords($_POST['lastName']));
+    $jobTitle = trim(ucwords($_POST['jobTitle']));
     $email = trim($_POST['email']);
     $deptID = $_POST['departmentID'];
     $deptName = $_POST['deptName'];
+
+
+
+	if (!isset($firstName) || empty($firstName) || !isset($lastName) || empty($lastName) || !isset($email) || empty($email) || !isset($deptID) || empty($deptID) || !isset($deptName) || empty($deptName)) {
+        $output['status']['code'] = "400";
+        $output['status']['name'] = "failure";
+        $output['status']['description'] = "There are one or more missing/empty inputs. Please make sure all necessary fields have input";
+        $output['status']['returnedIn'] = (microtime(true) - $executionStartTime) / 1000 . " ms";
+        $output['data'] = [];
+    
+        mysqli_close($conn);
+    
+        echo json_encode($output);
+    
+        exit;
+    }
+
 
 	$query = $conn->prepare('INSERT INTO personnel (firstName, lastName, jobTitle, email, departmentID) VALUES(?,?,?,?,?)');
 
@@ -46,7 +65,7 @@
 
 		$output['status']['code'] = "400";
 		$output['status']['name'] = "executed";
-		$output['status']['description'] = "query failed";	
+		$output['status']['description'] = "The query failed";	
 		$output['data'] = [];
 
 		mysqli_close($conn);
@@ -59,9 +78,9 @@
 
 	$output['status']['code'] = "200";
 	$output['status']['name'] = "ok";
-	$output['status']['description'] = "success";
+	$output['status']['description'] = "New record created for $firstname $lastName in the $deptName department";
 	$output['status']['returnedIn'] = (microtime(true) - $executionStartTime) / 1000 . " ms";
-	$output['data'] = [$firstName,$lastName,$jobTitle,$email,$deptName];
+	$output['data'] = [];
 	
 	mysqli_close($conn);
 

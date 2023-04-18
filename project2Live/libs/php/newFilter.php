@@ -1,5 +1,8 @@
 <?php
 
+	// example use from browser
+	// http://localhost/companydirectory/libs/php/getAll.php
+
 	$executionStartTime = microtime(true);
 
 	include("config.php");
@@ -23,8 +26,6 @@
 		exit;
 
 	}	
-
-	// SQL does not accept parameters and so is not prepared
 
 	$selectedDeptValues = $_POST['array1'];
     $selectedLocationValues = $_POST['array2'];

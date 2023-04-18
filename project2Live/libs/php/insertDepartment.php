@@ -1,4 +1,7 @@
 <?php
+
+    // example use from browser
+    // http://localhost/companydirectory/libs/php/insertDepartment.php?name=New%20Department&location=<location>
     
     $executionStartTime = microtime(true);
     
@@ -26,14 +29,35 @@
     
     }   
     
-    $newDept = trim(ucfirst($_POST['deptName']));
+    $newDept = trim(ucwords($_POST['deptName']));
 	$newDeptLocationID = $_POST['locationID'];
 	$newDeptLocation = $_POST['locationName'];
     
-    $query = "SELECT * FROM department WHERE name = '$newDept'";
+
+    if (!isset($newDept) || empty($newDept) || !isset($newDeptLocationID) || empty($newDeptLocationID)) {
+        $output['status']['code'] = "400";
+        $output['status']['name'] = "failure";
+        $output['status']['description'] = "Missing or empty location ID or Department name";
+        $output['status']['returnedIn'] = (microtime(true) - $executionStartTime) / 1000 . " ms";
+        $output['data'] = [];
     
-    $result = $conn->query($query);
+        mysqli_close($conn);
     
+        echo json_encode($output);
+    
+        exit;
+    }
+    
+    
+    $query = $conn->prepare('SELECT * FROM department WHERE name = ?');
+
+    $query->bind_param("s", $newDept);
+
+    $query->execute();
+
+    $result = $query->get_result();
+
+
     if ($result->num_rows > 0) {
         // dept already exists
         $output['status']['code'] = "400";
@@ -79,8 +103,5 @@
         mysqli_close($conn);
     
         echo json_encode($output);
-    }
-    // SQL statement accepts parameters and so is prepared to avoid SQL injection.
-    // $_REQUEST used for development / debugging. Remember to change to $_POST for production
-    
+    }    
 ?>

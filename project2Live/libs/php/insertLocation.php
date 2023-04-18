@@ -1,4 +1,7 @@
 <?php
+
+    // example use from browser
+    // http://localhost/companydirectory/libs/php/insertDepartment.php?name=New%20Department&location=<location>
     
     $executionStartTime = microtime(true);
     
@@ -26,11 +29,33 @@
     
     }   
     
-    $newLocation = trim(ucfirst($_POST['location']));
+    $newLocation = trim(ucwords($_POST['location']));
+
+    if (!isset($newLocation) || empty($newLocation)) {
+        $output['status']['code'] = "400";
+        $output['status']['name'] = "failure";
+        $output['status']['description'] = "Missing or empty location name";
+        $output['status']['returnedIn'] = (microtime(true) - $executionStartTime) / 1000 . " ms";
+        $output['data'] = [];
     
-    $query = "SELECT * FROM location WHERE name = '$newLocation'";
+        mysqli_close($conn);
     
-    $result = $conn->query($query);
+        echo json_encode($output);
+    
+        exit;
+    }
+    
+
+    $query = $conn->prepare('SELECT * FROM location WHERE name = ?');
+
+    $query->bind_param("s", $newLocation);
+
+    $query->execute();
+
+    $result = $query->get_result();
+
+
+
     
     if ($result->num_rows > 0) {
         // location already exists
@@ -70,7 +95,7 @@
     
         $output['status']['code'] = "200";
         $output['status']['name'] = "ok";
-        $output['status']['description'] = "$newLocation added to the list of locations in the database";
+        $output['status']['description'] = "$newLocation has been added to the list of locations in the database";
         $output['status']['returnedIn'] = (microtime(true) - $executionStartTime) / 1000 . " ms";
         $output['data'] = [];
         
@@ -78,7 +103,5 @@
     
         echo json_encode($output);
     }
-    // SQL statement accepts parameters and so is prepared to avoid SQL injection.
-    // $_REQUEST used for development / debugging. Remember to change to $_POST for production
-    
+
 ?>

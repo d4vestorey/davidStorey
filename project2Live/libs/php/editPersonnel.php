@@ -1,5 +1,9 @@
 <?php
 
+	// example use from browser
+	// use insertDepartment.php first to create new dummy record and then specify it's id in the command below
+	// http://localhost/companydirectory/libs/php/deleteDepartmentByID.php?id=<id>
+
 	$executionStartTime = microtime(true);
 
 	include("config.php");
@@ -12,7 +16,7 @@
 		
 		$output['status']['code'] = "300";
 		$output['status']['name'] = "failure";
-		$output['status']['description'] = "database unavailable";
+		$output['status']['description'] = "The database is currently unavailable";
 		$output['status']['returnedIn'] = (microtime(true) - $executionStartTime) / 1000 . " ms";
 		$output['data'] = [];
 
@@ -28,12 +32,28 @@
 	// $_REQUEST used for development / debugging. Remember to change to $_POST for production
 
     $personnelId = $_POST['id'];
-    $firstName = $_POST['firstName'];
-    $lastName = $_POST['lastName'];
-    $jobTitle = $_POST['jobTitle'];
+    $firstName = trim(ucwords($_POST['firstName']));
+    $lastName = trim(ucwords($_POST['lastName']));
+    $jobTitle = trim(ucwords($_POST['jobTitle']));
     $deptName = $_POST['deptName'];
     $deptID = $_POST['departmentID'];
-    $email= $_POST['email'];
+    $email= trim($_POST['email']);
+
+
+	if (!isset($personnelId) || empty($personnelId)) {
+        $output['status']['code'] = "400";
+        $output['status']['name'] = "failure";
+        $output['status']['description'] = "Missing or empty personnel ID";
+        $output['status']['returnedIn'] = (microtime(true) - $executionStartTime) / 1000 . " ms";
+        $output['data'] = [];
+    
+        mysqli_close($conn);
+    
+        echo json_encode($output);
+    
+        exit;
+    }
+
 
     //call to db to get current personnel info for individual
     $query = $conn->prepare('SELECT p.id, p.lastName, p.firstName, p.jobTitle, p.email, d.name as department, l.name as location FROM personnel p LEFT JOIN department d ON (d.id = p.departmentID) LEFT JOIN location l ON (l.id = d.locationID) WHERE p.id=?');
@@ -53,27 +73,28 @@
 
 	$query->execute();
 	
-	if (false === $query) {
+	if ($query->error) {
 
-		$output['status']['code'] = "400";
-		$output['status']['name'] = "executed";
-		$output['status']['description'] = "query failed";	
-		$output['data'] = [];
+        $output['status']['code'] = "400";
+        $output['status']['name'] = "failure";
+        $output['status']['description'] = "There was an error executing your request";
+        $output['status']['returnedIn'] = (microtime(true) - $executionStartTime) / 1000 . " ms";
+        $output['data'] = [];
 
-		mysqli_close($conn);
+        mysqli_close($conn);
 
-		echo json_encode($output); 
+        echo json_encode($output);
 
-		exit;
+        exit;
 
-	}
+    }
 
  
 	$output['status']['code'] = "200";
 	$output['status']['name'] = "ok";
-	$output['status']['description'] = "success";
+	$output['status']['description'] = "The record for $firstName $lastName in the $deptName department was successfully updated";
 	$output['status']['returnedIn'] = (microtime(true) - $executionStartTime) / 1000 . " ms";
-    $output['newData'] = [$firstName, $lastName, $jobTitle, $email, $deptName];
+    $output['newData'] = [];
 
     mysqli_close($conn);
 

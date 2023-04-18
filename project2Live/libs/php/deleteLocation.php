@@ -1,5 +1,8 @@
 <?php
 
+    // example use from browser
+    // http://localhost/companydirectory/libs/php/deleteLocation.php?id=<id>
+
     $executionStartTime = microtime(true);
     
     // this includes the login details
@@ -29,10 +32,30 @@
     $locationID = $_POST['locationID'];
     $location = $_POST['name'];
 
-    // check if location is being referenced in department table
-    $query = "SELECT COUNT(*) as total FROM department WHERE locationID = $locationID";
+    //validation
+    if (!isset($locationID) || empty($locationID)) {
+        $output['status']['code'] = "400";
+        $output['status']['name'] = "failure";
+        $output['status']['description'] = "Missing or empty location ID";
+        $output['status']['returnedIn'] = (microtime(true) - $executionStartTime) / 1000 . " ms";
+        $output['data'] = [];
+    
+        mysqli_close($conn);
+    
+        echo json_encode($output);
+    
+        exit;
+    }
 
-    $result = $conn->query($query);
+    // check if location is being referenced in department table
+    $query = $conn->prepare("SELECT COUNT(*) as total FROM department WHERE locationID = ?");
+
+    $query->bind_param("i", $locationID);
+
+    $query->execute();
+
+    $result = $query->get_result();
+
 
     if ($result->num_rows > 0) {
 
@@ -42,7 +65,7 @@
 
             $output['status']['code'] = "400";
             $output['status']['name'] = "failure";
-            $output['status']['description'] = "$location is being referenced in the department table. Unable to delete this location";
+            $output['status']['description'] = "$location is being referenced in the department table, unable to delete this location";
             $output['status']['returnedIn'] = (microtime(true) - $executionStartTime) / 1000 . " ms";
             $output['data'] = [];
 
@@ -57,15 +80,17 @@
     }
 
     // delete location
-    $query = "DELETE FROM location WHERE id = $locationID";
+    $delQuery = $conn->prepare("DELETE FROM location WHERE id = ?");
 
-    $result = $conn->query($query);
+    $delQuery->bind_param("i", $locationID);
 
-    if (!$result) {
+    $delQuery->execute();
+
+    if ($delQuery->error) {
 
         $output['status']['code'] = "400";
         $output['status']['name'] = "failure";
-        $output['status']['description'] = "query failed";
+        $output['status']['description'] = $delQuery->error;
         $output['status']['returnedIn'] = (microtime(true) - $executionStartTime) / 1000 . " ms";
         $output['data'] = [];
 

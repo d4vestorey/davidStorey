@@ -1,5 +1,8 @@
 <?php
 
+	// example use from browser
+	// http://localhost/companydirectory/libs/php/getAllDepartments.php
+
 	$executionStartTime = microtime(true);
 
 	include("config.php");
@@ -52,7 +55,6 @@
 		array_push($data, $row);
 
 	}
-
 
 
 	$output['status']['code'] = "200";

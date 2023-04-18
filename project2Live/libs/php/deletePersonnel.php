@@ -1,5 +1,8 @@
 <?php
 
+	// example use from browser
+	// use insertDepartment.php first to create new dummy record and then specify it's id in the command below
+	// http://localhost/companydirectory/libs/php/deleteDepartmentByID.php?id=<id>
 
 	$executionStartTime = microtime(true);
 
@@ -13,7 +16,7 @@
 		
 		$output['status']['code'] = "300";
 		$output['status']['name'] = "failure";
-		$output['status']['description'] = "database unavailable";
+		$output['status']['description'] = "The database is unavailable";
 		$output['status']['returnedIn'] = (microtime(true) - $executionStartTime) / 1000 . " ms";
 		$output['data'] = [];
 
@@ -31,8 +34,24 @@
     $personnelId = $_POST['id'];
     $firstName = $_POST['firstName'];
     $lastName = $_POST['lastName'];
-    $jobTitle = $_POST['jobTitle'];
     $deptName = $_POST['deptName'];
+
+
+	//validation
+	if (!isset($personnelId) || empty($personnelId)) {
+		$output['status']['code'] = "400";
+		$output['status']['name'] = "failure";
+		$output['status']['description'] = "Missing or empty personnel ID";
+		$output['status']['returnedIn'] = (microtime(true) - $executionStartTime) / 1000 . " ms";
+		$output['data'] = [];
+	
+		mysqli_close($conn);
+	
+		echo json_encode($output);
+	
+		exit;
+	}
+
 
 	$query = $conn->prepare('DELETE FROM personnel WHERE id = ?');
 	
@@ -40,26 +59,27 @@
 
 	$query->execute();
 	
-	if (false === $query) {
+	if ($query->error) {
 
-		$output['status']['code'] = "400";
-		$output['status']['name'] = "executed";
-		$output['status']['description'] = "query failed";	
-		$output['data'] = [];
+        $output['status']['code'] = "400";
+        $output['status']['name'] = "failure";
+        $output['status']['description'] = "There was an error with the execution of your request";
+        $output['status']['returnedIn'] = (microtime(true) - $executionStartTime) / 1000 . " ms";
+        $output['data'] = [];
 
-		mysqli_close($conn);
+        mysqli_close($conn);
 
-		echo json_encode($output); 
+        echo json_encode($output);
 
-		exit;
+        exit;
 
-	}
+    }
 
 	$output['status']['code'] = "200";
 	$output['status']['name'] = "ok";
-	$output['status']['description'] = "success";
+	$output['status']['description'] = "The record with ID $personnelId for $firstName $lastName in the $deptName department has been deleted";
 	$output['status']['returnedIn'] = (microtime(true) - $executionStartTime) / 1000 . " ms";
-	$output['data'] = [$personnelId, $firstName, $lastName, $jobTitle, $deptName];
+	$output['data'] = [$personnelId];
 	
 	mysqli_close($conn);
 

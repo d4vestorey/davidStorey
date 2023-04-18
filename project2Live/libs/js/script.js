@@ -538,7 +538,7 @@ function getAllDepartments () {
             //options for select dropdown
             let departments = $('.deptOptions');
             data.forEach(function(option){
-                $('<option>').text(option.name).val(option.id).appendTo(departments); //does this intefer with adding new record?
+                $('<option>').text(option.name).val(option.id).appendTo(departments); 
             });
 
               //options for dept filter
@@ -626,13 +626,15 @@ function filterRecords(){
     };
     
     $.ajax({
-        type: "GET",
+        type: "POST",
         url: "libs/php/newFilter.php",
         dataType: "json",
         data: postData,
        
         success: function(data) {
-            
+
+          console.log(data);
+
             $.each(data.data, function(key, value) {
                 $("#records").append("<tr data-row-id='" + value.id + "'class='employee'><td>" + value.firstName + "</td><td>" + value.lastName + "</td><td>" + value.jobTitle + "</td><td data-dept='" + value.deptID + "'>" + value.department + "</td><td>" + value.email + "</td><td>" + value.location + "</td><td><button data-row-id='" + value.id + "' data-bs-toggle='modal' data-bs-target='#editRecordModal' class='btn btn-primary editRecModalBtn'><i class='fa fa-user-pen fa-xs'></i></button></td><td> <button data-row-id='" + value.id + "' data-bs-toggle='modal' data-bs-target='#deleteRecordModal' class='btn btn-danger delRecModalBtn'><i class='fa fa-trash fa-xs'></i></button></td></tr>");
                 });

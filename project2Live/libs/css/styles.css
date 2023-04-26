@@ -9,7 +9,7 @@
     left: 0;
     right: 0;
     bottom: 0;
-    z-index: 1;
+    z-index: 99;
     overflow: hidden;
     background: #fff;
 }
@@ -51,4 +51,30 @@
 
 .list-group-item {
     font-size: small;
+}
+
+.nav .nav-link {
+    color: grey;
+}
+
+.nav .active {
+    background-color: white !important;
+    color: black !important;
+}
+
+.nav .nav-link:hover {
+    background-color: lightgrey;
+}
+
+#searchFilterControls {
+    top: 41px;
+}
+
+.scrollable-div{
+    height: 400px;
+    overflow-y: scroll;
+}
+
+.myBtn {
+    width: 70px;
 }

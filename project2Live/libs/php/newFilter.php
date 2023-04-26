@@ -1,5 +1,9 @@
 <?php
 
+	// example use from browser
+	// http://localhost/companydirectory/libs/php/getAll.php
+
+
 	$executionStartTime = microtime(true);
 
 	include("config.php");
@@ -27,16 +31,9 @@
 	$selectedDeptValues = $_POST['array1'];
     $selectedLocationValues = $_POST['array2'];
 
-
     // prepare the statement
-    $stmt = $conn->prepare("SELECT p.id, p.lastName, p.firstName, p.jobTitle, p.email, d.name as department, l.name as location FROM personnel p LEFT JOIN department d ON (d.id = p.departmentID) LEFT JOIN location l ON (l.id = d.locationID) WHERE d.id IN (" . implode(",", array_fill(0, count($selectedDeptValues), "?")) . ") AND l.id IN (" . implode(",", array_fill(0, count($selectedLocationValues), "?")) . ")ORDER BY p.lastName, p.firstName, d.name, l.name");
-    
-
-	if (!$stmt) {
-		printf("Error message: %s\n", $conn->error);
-		exit;
-	};
-
+    $stmt = $conn->prepare("SELECT p.id, CONCAT(p.lastName, ', ', p.firstName) as lastFirst, p.jobTitle, p.email, d.name as department, l.name as location FROM personnel p LEFT JOIN department d ON (d.id = p.departmentID) LEFT JOIN location l ON (l.id = d.locationID) WHERE d.id IN (" . implode(",", array_fill(0, count($selectedDeptValues), "?")) . ") AND l.id IN (" . implode(",", array_fill(0, count($selectedLocationValues), "?")) . ")ORDER BY p.lastName, p.firstName, l.name");
+        
     // bind the parameters
     $params = array_merge($selectedDeptValues, $selectedLocationValues);
     $types = str_repeat('i', count($params));

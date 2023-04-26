@@ -4,6 +4,7 @@
 	// use insertDepartment.php first to create new dummy record and then specify it's id in the command below
 	// http://localhost/companydirectory/libs/php/deleteDepartmentByID.php?id=<id>
 
+
 	$executionStartTime = microtime(true);
 
 	include("config.php");
@@ -77,7 +78,7 @@
 
 	$output['status']['code'] = "200";
 	$output['status']['name'] = "ok";
-	$output['status']['description'] = "The record with ID $personnelId for $firstName $lastName in the $deptName department has been deleted";
+	$output['status']['description'] = "The record for $firstName $lastName in the $deptName department has been deleted";
 	$output['status']['returnedIn'] = (microtime(true) - $executionStartTime) / 1000 . " ms";
 	$output['data'] = [$personnelId];
 	

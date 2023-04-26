@@ -3,6 +3,7 @@
 	// example use from browser
 	// http://localhost/companydirectory/libs/php/getAllDepartments.php
 
+
 	$executionStartTime = microtime(true);
 
 	include("config.php");

@@ -30,6 +30,7 @@
 	}	
 
 	// SQL statement accepts parameters and so is prepared to avoid SQL injection.
+	// $_REQUEST used for development / debugging. Remember to change to $_POST for production
 
     $firstName = trim(ucwords($_POST['firstName']));
     $lastName = trim(ucwords($_POST['lastName']));
@@ -78,7 +79,7 @@
 
 	$output['status']['code'] = "200";
 	$output['status']['name'] = "ok";
-	$output['status']['description'] = "New record created for $firstname $lastName in the $deptName department";
+	$output['status']['description'] = "New record created for $firstName $lastName in the $deptName department";
 	$output['status']['returnedIn'] = (microtime(true) - $executionStartTime) / 1000 . " ms";
 	$output['data'] = [];
 	

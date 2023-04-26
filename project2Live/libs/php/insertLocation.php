@@ -2,6 +2,7 @@
 
     // example use from browser
     // http://localhost/companydirectory/libs/php/insertDepartment.php?name=New%20Department&location=<location>
+
     
     $executionStartTime = microtime(true);
     
@@ -103,5 +104,7 @@
     
         echo json_encode($output);
     }
-
+    // SQL statement accepts parameters and so is prepared to avoid SQL injection.
+    // $_REQUEST used for development / debugging. Remember to change to $_POST for production
+    
 ?>

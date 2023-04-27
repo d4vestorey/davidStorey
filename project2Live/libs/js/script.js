@@ -336,6 +336,8 @@ $('#editRecordModal').on('show.bs.modal', function (e) {
 
         // Update the hidden input with the employee id so that
         // it can be referenced when the form is submitted
+
+        console.log(result);
         
         $('#idEdit').val(result.data.personnel[0].id);
         
@@ -345,6 +347,7 @@ $('#editRecordModal').on('show.bs.modal', function (e) {
         $('#emailEdit').val(result.data.personnel[0].email);
         
         $('#deptEdit option:selected').text(result.data.personnel[0].name);
+        $('#deptEdit option:selected').val(result.data.personnel[0].departmentID);
         
         
       } else {
@@ -362,7 +365,6 @@ $('#editRecordModal').on('show.bs.modal', function (e) {
 });
 
 //////////////////////////////////////////////////////////////
-
 
 
 //add new location
@@ -1195,6 +1197,18 @@ function customPersonnelAlert (code, description) {
             'error'
           )
     } else if (code == 300){
+        Swal.fire(
+            'Error!',
+            description,
+            'error'
+          )
+    } else if (code == 100){
+        Swal.fire(
+            'Warning',
+            description,
+            'warning'
+          )
+    } else if (code == 500){
         Swal.fire(
             'Error!',
             description,

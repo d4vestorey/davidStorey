@@ -148,8 +148,8 @@
             </div>
           </form>
             <div class="d-flex justify-content-center modal-footer">
-                <button type="submit" form="employeeRecordForm" class="btn btn-success myBtn" id="personnelBtnSaveClose">Save</button>
-                <button type="button" class="btn btn-secondary closeModal myBtn" data-bs-dismiss="modal" id="personnelBtnClose">Close</button>
+                <button type="submit" form="employeeRecordForm" class="btn btn-success myBtn">Save</button>
+                <button type="button" class="btn btn-secondary closeModal myBtn" data-bs-dismiss="modal">Close</button>
             </div>
         </div>
       </div>
@@ -157,49 +157,51 @@
   </div>
 
 
-   <!-- delete personnel record Modal -->
-   <div class="modal fade" id="deleteRecordModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-sm">
-      <div class="modal-content">
-        <div class="modal-header bg-danger bg-gradient text-white">
-          <h5 class="modal-title">Delete Record</h5>
-          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <div class="modal-body">
-            <form id='deletePersonnelRecordForm'>
-                <div class="d-none">
-                    <label for='idDel' class='form-label'>Personnel ID</label>
-                    <input type="text" class="form-control" id="idDel" readonly></input>
-                </div>
-                <div class="form-floating mb-3">
-                  <input type="text" class="form-control" id="firstNameDel" readonly></input>  
-                  <label for='firstNameDel' class='form-label'>First Name</label>                    
-                </div>
-                <div class="form-floating mb-3">
-                  <input type="text" class="form-control" id="lastNameDel" readonly></input>  
-                  <label for='lastNameDel' class='form-label'>Last Name</label>                    
-                </div>
-                <div class="form-floating mb-3">
-                  <input type="text" class="form-control" id="jobTitleDel" readonly></input>  
-                  <label for='jobTitleDel' class='form-label'>Job Title</label>                    
-                </div>
-                <div class="form-floating mb-3">
-                  <input type="email" class="form-control" id="emailDel" readonly></input>  
-                  <label for='emailDel' class='form-label' required>email</label>                    
-                </div>
-                <div class="form-floating mb-3">
-                  <input type="text" class="form-control" id="deptDel" readonly></input>  
-                  <label for='deptDel' class='form-label'>Department</label>                    
-                </div>
-                </form>
-                <div class="modal-footer d-flex justify-content-center">
-                    <button type="submit" form="deletePersonnelRecordForm" class="btn btn-danger myBtn" id="deleteBtnSaveClose">Delete</button>
-                    <button type="button" class="btn btn-secondary myBtn" data-bs-dismiss="modal" id="deleteBtnClose">Close</button>
-                </div>
-        </div>
+<!-- delete personnel record Modal -->
+<div class="modal fade" id="deleteRecordModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-sm">
+    <div class="modal-content">
+      <div class="modal-header bg-danger bg-gradient text-white">
+        <h5 class="modal-title">Delete Record</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+          <form id='deletePersonnelRecordForm'>
+              <div class="d-none">
+                  <label for='idDel' class='form-label'>Personnel ID</label>
+                  <input type="text" class="form-control" id="idDel" readonly></input>
+              </div>
+              <div class="form-floating mb-3 d-none">
+                <input type="text" class="form-control" id="firstNameDel" readonly></input>  
+                <label for='firstNameDel' class='form-label'>First Name</label>                    
+              </div>
+              <div class="form-floating mb-3 d-none">
+                <input type="text" class="form-control" id="lastNameDel" readonly></input>  
+                <label for='lastNameDel' class='form-label'>Last Name</label>                    
+              </div>
+              <div class="form-floating mb-3 d-none">
+                <input type="text" class="form-control" id="jobTitleDel" readonly></input>  
+                <label for='jobTitleDel' class='form-label'>Job Title</label>                    
+              </div>
+              <div class="form-floating mb-3 d-none">
+                <input type="email" class="form-control" id="emailDel" readonly></input>  
+                <label for='emailDel' class='form-label' required>email</label>                    
+              </div>
+              <div class="form-floating mb-3 d-none">
+                <input type="text" class="form-control" id="deptDel" readonly></input>  
+                <label for='deptDel' class='form-label'>Department</label>                    
+              </div>
+              </form>
+              <p id="personnelConfirmDelMsg" class="text-center">
+              </p>
+              <div class="modal-footer d-flex justify-content-center">
+                  <button type="submit" form="deletePersonnelRecordForm" class="btn btn-danger myBtn" id="deleteBtnSaveClose">Delete</button>
+                  <button type="button" class="btn btn-secondary myBtn" data-bs-dismiss="modal" id="deleteBtnClose">Close</button>
+              </div>
       </div>
     </div>
   </div>
+</div>
 
 
   <!-- edit personnel record Modal -->
@@ -240,8 +242,8 @@
                   </div>
                   </form>
                   <div class="modal-footer d-flex justify-content-center">
-                      <button type="submit" form="editPersonnelRecordForm" class="btn btn-success myBtn" id="deleteBtnSaveClose">Save</button>
-                      <button type="button" class="btn btn-secondary myBtn" data-bs-dismiss="modal" id="deleteBtnClose">Close</button>
+                      <button type="submit" form="editPersonnelRecordForm" class="btn btn-success myBtn">Save</button>
+                      <button type="button" class="btn btn-secondary myBtn" data-bs-dismiss="modal">Close</button>
                   </div>
           </div>
         </div>
@@ -266,8 +268,8 @@
             </div>
             </form>
             <div class="modal-footer d-flex justify-content-center">
-                <button type="submit" form="addNewLocationForm" class="btn btn-success myBtn" id="newLocationBtnSaveClose">Save</button>
-                <button type="button" class="btn btn-secondary myBtn closeModal" data-bs-dismiss="modal" id="newLocationBtnClose">Close</button>
+                <button type="submit" form="addNewLocationForm" class="btn btn-success myBtn">Save</button>
+                <button type="button" class="btn btn-secondary myBtn closeModal" data-bs-dismiss="modal">Close</button>
             </div>
         </div>
       </div>
@@ -297,8 +299,8 @@
           </div>
           </form>
             <div class="modal-footer d-flex justify-content-center">
-                <button type="submit" form="addNewDepartmentForm" class="btn btn-success myBtn" id="newDepartmentBtnSaveClose">Save</button>
-                <button type="button" class="btn btn-secondary closeModal myBtn" data-bs-dismiss="modal" id="newDepartmentBtnClose">Close</button>
+                <button type="submit" form="addNewDepartmentForm" class="btn btn-success myBtn">Save</button>
+                <button type="button" class="btn btn-secondary closeModal myBtn" data-bs-dismiss="modal">Close</button>
             </div>
         </div>
       </div>
@@ -335,8 +337,8 @@
               </div>
               </form>
                 <div class="modal-footer d-flex justify-content-center">
-                    <button type="submit" form="editDepartmentRecordForm" class="btn btn-success myBtn" id="editDeptBtnSaveClose">Save</button>
-                    <button type="button" class="btn btn-secondary myBtn" data-bs-dismiss="modal" id="editDeptBtnClose">Close</button>
+                    <button type="submit" form="editDepartmentRecordForm" class="btn btn-success myBtn">Save</button>
+                    <button type="button" class="btn btn-secondary myBtn" data-bs-dismiss="modal">Close</button>
                 </div>
         </div>
       </div>
@@ -369,8 +371,8 @@
             </div>
             </form>
             <div class="modal-footer d-flex justify-content-center">
-                <button type="submit" form="deleteDepartmentForm" class="btn btn-danger myBtn" id="delDepartmentBtnSaveClose">Delete</button>
-                <button type="button" class="btn btn-secondary closeModal myBtn" data-bs-dismiss="modal" id="delDepartmentBtnClose">Close</button>
+                <button type="submit" form="deleteDepartmentForm" class="btn btn-danger myBtn">Delete</button>
+                <button type="button" class="btn btn-secondary closeModal myBtn" data-bs-dismiss="modal">Close</button>
             </div>
         </div>
       </div>
@@ -400,8 +402,8 @@
             </div>
             </form>
             <div class="modal-footer d-flex justify-content-center">
-                <button type="submit" form="deleteLocationForm" class="btn btn-danger myBtn" id="delLocationBtnSaveClose">Delete</button>
-                <button type="button" class="btn btn-secondary closeModal myBtn" data-bs-dismiss="modal" id="delLocationBtnClose">Close</button>
+                <button type="submit" form="deleteLocationForm" class="btn btn-danger myBtn">Delete</button>
+                <button type="button" class="btn btn-secondary closeModal myBtn" data-bs-dismiss="modal">Close</button>
             </div>
         </div>
       </div>
@@ -429,8 +431,8 @@
               </div>
               </form>
               <div class="modal-footer d-flex justify-content-center">
-                  <button type="submit" form="editLocationRecordForm" class="btn btn-success myBtn" id="editLocationBtnSaveClose">Save</button>
-                  <button type="button" class="btn btn-secondary myBtn" data-bs-dismiss="modal" id="editLocationBtnClose">Close</button>
+                  <button type="submit" form="editLocationRecordForm" class="btn btn-success myBtn">Save</button>
+                  <button type="button" class="btn btn-secondary myBtn" data-bs-dismiss="modal">Close</button>
               </div>
       </div>
     </div>

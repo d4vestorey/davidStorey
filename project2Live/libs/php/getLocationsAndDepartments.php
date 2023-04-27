@@ -57,6 +57,9 @@
 
 	}
 
+	usort($data, function($a, $b) {
+		return strcmp($a['deptName'], $b['deptName']);
+	});
 
 
 	$output['status']['code'] = "200";

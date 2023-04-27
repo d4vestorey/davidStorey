@@ -66,6 +66,21 @@
     //save previous state
     $output['prevData'] = $prevData;
 
+    if($prevData['lastName'] == $lastName && $prevData['firstName'] == $firstName && $prevData['jobTitle'] == $jobTitle && $prevData['department'] == $deptName && $prevData['email'] == $email){
+        
+        $output['status']['code'] = "100";
+        $output['status']['name'] = "no update detected";
+        $output['status']['description'] = "No changes were detected for $firstName $lastName.";
+        $output['status']['returnedIn'] = (microtime(true) - $executionStartTime) / 1000 . " ms";
+        $output['data'] = [];
+
+        mysqli_close($conn);
+
+        echo json_encode($output);
+
+        exit;
+    }
+
     //call to update personnel record
 	$query = $conn->prepare('UPDATE personnel SET firstName=?, lastName=?, jobTitle=?, email=?, departmentID=? WHERE id=?');
 	

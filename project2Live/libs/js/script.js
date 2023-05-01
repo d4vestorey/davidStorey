@@ -172,7 +172,7 @@ const newPersonnelModal = new bootstrap.Modal(document.querySelector('#staticBac
 
 function createNewPersonnelRecord(){
     $.ajax({
-        type: "GET",
+        type: "POST",
         url: "libs/php/insertPersonnel.php",
         dataType: "json",
         data:{
@@ -180,7 +180,7 @@ function createNewPersonnelRecord(){
             lastName: $("#lastNameInput").val(),
             jobTitle: $("#jobTitleInput").val(),
             email: $("#emailInput").val(),
-            departmentID: $("#deptInput").val(),
+            departmentID: $("#deptInput option:selected").val(),
             deptName: $("#deptInput option:selected").text(),
         },
         success: function(data) {
@@ -203,7 +203,7 @@ const deletePersonnelRecordModal = new bootstrap.Modal(document.querySelector('#
 function deletePersonnelRecord() {
     
     $.ajax({
-        type: "GET",
+        type: "POST",
         url: "libs/php/deletePersonnel.php",
         dataType: "json",
         data:{
@@ -214,9 +214,14 @@ function deletePersonnelRecord() {
             email: $("#emailDel").val(),
             deptName: $("#deptDel").val(),
         },
+        
         success: function(data) {
+
+            console.log($("#idDel").val());
             
             customPersonnelAlert(data.status.code, data.status.description);
+
+            console.log(data.data[0]);
             
             let rowToDelete = document.querySelector(`#records tr[data-row-id="${data.data[0]}"]`);
             rowToDelete.remove();
@@ -244,12 +249,17 @@ $('#deleteRecordModal').on('show.bs.modal', function (e) {
             
       var resultCode = result.status.code
 
+      console.log(result);
+
       if (resultCode == 200) {
 
         // Update the hidden input with the employee id so that
         // it can be referenced when the form is submitted
         
         $('#idDel').val(result.data.personnel[0].id);
+
+        console.log(result.data.personnel[0].id);
+        console.log($('#idDel').val());
         
         $('#firstNameDel').val(result.data.personnel[0].firstName);
         $('#lastNameDel').val(result.data.personnel[0].lastName);
@@ -517,8 +527,7 @@ $('#editLocationModal').on('show.bs.modal', function (e) {
 
       if (resultCode == 200) {
 
-        // Update the hidden input with the employee id so that
-        // it can be referenced when the form is submitted
+
         console.log(result.data.deptName);
         
         $('#locationIdEdit').val(result.data[0].id);
@@ -527,13 +536,13 @@ $('#editLocationModal').on('show.bs.modal', function (e) {
         
       } else {
 
-        $('#editDepartmentModal .modal-title').replaceWith("Error retrieving data");
+        $('#editLocationModal .modal-title').replaceWith("Error retrieving data");
 
       } 
 
     },
     error: function (jqXHR, textStatus, errorThrown) {
-      $('#editDepartmentModal .modal-title').replaceWith("Error retrieving data");
+      $('#editLocationModal .modal-title').replaceWith("Error retrieving data");
     }
   });
 
@@ -697,14 +706,21 @@ $('#editDepartmentModal').on('show.bs.modal', function (e) {
 
       if (resultCode == 200) {
 
-        // Update the hidden input with the employee id so that
-        // it can be referenced when the form is submitted
-        console.log(result.data.deptName);
+        console.log(result.data[0].deptName);
+
+        console.log(result.location[0].name);
         
         $('#deptIdEdit').val(result.data[0].deptID);
         $('#deptNameEdit').val(result.data[0].deptName);
-        $('#deptLocationEdit option:selected').text(result.data[0].locationName);
-        $('#deptLocationEdit option:selected').val(result.data[0].locationID);
+
+
+        let locations = $('#deptLocationEdit');
+            result.location.forEach(function(option){
+                $('<option>').text(option.name).val(option.id).appendTo(locations);
+            });
+        
+            let defaultLocation = result.data[0].locationID;
+            locations.val(defaultLocation);
         
         
       } else {
@@ -720,6 +736,14 @@ $('#editDepartmentModal').on('show.bs.modal', function (e) {
   });
 
 });
+
+
+//Clears the location drop down ready for the next edit modal open and populate
+$('#editDepartmentModal').on('hidden.bs.modal', function () {
+  
+    $('#deptLocationEdit').empty();
+    
+  });
 
 //////////////////////////////////////////////////////////////
 
@@ -852,7 +876,7 @@ function filterRecords(){
     };
     
     $.ajax({
-        type: "GET",
+        type: "POST",
         url: "libs/php/newFilter.php",
         dataType: "json",
         data: postData,

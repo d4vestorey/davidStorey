@@ -41,7 +41,7 @@
 
 
 
-	if (!isset($firstName) || empty($firstName) || !isset($lastName) || empty($lastName) || !isset($email) || empty($email) || !isset($deptID) || empty($deptID) || !isset($deptName) || empty($deptName)) {
+	if (!isset($firstName) || empty($firstName) || !isset($lastName) || empty($lastName) || !isset($email) || empty($email) || !isset($deptID) || empty($deptID)) {
         $output['status']['code'] = "400";
         $output['status']['name'] = "failure";
         $output['status']['description'] = "There are one or more missing/empty inputs. Please make sure all necessary fields have input";

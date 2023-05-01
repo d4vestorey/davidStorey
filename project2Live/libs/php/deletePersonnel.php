@@ -44,7 +44,7 @@
 		$output['status']['name'] = "failure";
 		$output['status']['description'] = "Missing or empty personnel ID";
 		$output['status']['returnedIn'] = (microtime(true) - $executionStartTime) / 1000 . " ms";
-		$output['data'] = [];
+		$output['data'] = [$personnelId];
 	
 		mysqli_close($conn);
 	

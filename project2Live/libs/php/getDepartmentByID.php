@@ -61,11 +61,47 @@
 
 	}
 
+	////
+
+	$queryLocation = 'SELECT id, name FROM location';
+
+	$resultLocation = $conn->query($queryLocation);
+	
+	if (!$resultLocation) {
+
+		$output['status']['code'] = "400";
+		$output['status']['name'] = "executed";
+		$output['status']['description'] = "query failed";	
+		$output['data'] = [];
+
+		mysqli_close($conn);
+
+		echo json_encode($output); 
+
+		exit;
+
+	}
+   
+   	$dataLocation = [];
+
+	while ($rowLocation = mysqli_fetch_assoc($resultLocation)) {
+
+		array_push($dataLocation, $rowLocation);
+
+	}
+
+	usort($dataLocation, function($a, $b) {
+		return strcmp($a['name'], $b['name']);
+	});
+
+	////
+
 	$output['status']['code'] = "200";
 	$output['status']['name'] = "ok";
 	$output['status']['description'] = "success";
 	$output['status']['returnedIn'] = (microtime(true) - $executionStartTime) / 1000 . " ms";
 	$output['data'] = $data;
+	$output['location'] = $dataLocation;
 
 	echo json_encode($output); 
 
